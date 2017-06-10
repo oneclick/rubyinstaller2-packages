@@ -22,7 +22,7 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver%.*}/${_realname}-${pkgver
         ruby.ico
         rubyw.ico)
 
-# To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD.erb"
+# To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
 sha256sums=('ccfb2d0a61e2a9c374d51e099b0d833b09241ee78fc17e1fe38e3b282160237c'
             '578bd0830fe96efc7656c732ec46b0658fc436a7a30d8945cf3b8240797809f0'
