@@ -169,7 +169,7 @@ deploy_enabled() {
     test -n "${BUILD_URL}" || return 1
     [[ "${DEPLOY_PROVIDER}" = bintray ]] || return 1
     local repository_account="$(git remote get-url origin | cut -d/ -f4)"
-    [[ "${repository_account,,}" = "${BINTRAY_ACCOUNT,,}" ]]
+    [[ "${repository_account,,}" = "oneclick" ]]
 }
 
 # Added commits
