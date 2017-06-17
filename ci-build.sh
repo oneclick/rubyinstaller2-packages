@@ -13,6 +13,12 @@ git_config user.name  'RubyInstaller2 Continuous Integration'
 git remote add upstream 'https://github.com/oneclick/rubyinstaller2-packages'
 git fetch --quiet upstream
 
+# Decrypt and import private sigature key
+deploy_enabled && (gpg --passphrase $gpgpasswd --decrypt appveyor-key.asc.asc | gpg --import)
+# Download and trust public signatur key
+pacman-key --recv-keys BE8BF1C5
+pacman-key --lsign-key BE8BF1C5
+
 # Detect
 list_commits  || failure 'Could not detect added commits'
 list_packages || failure 'Could not detect changed files'
@@ -25,11 +31,11 @@ message 'Building packages' "${packages[@]}"
 execute 'Updating system' update_system
 execute 'Approving recipe quality' check_recipe_quality
 for package in "${packages[@]}"; do
-    execute 'Building binary' makepkg-mingw --noconfirm --noprogressbar --skippgpcheck --nocheck --syncdeps --rmdeps --cleanbuild
-    execute 'Building source' makepkg --noconfirm --noprogressbar --skippgpcheck --allsource --config '/etc/makepkg_mingw64.conf'
+    execute 'Building binary' makepkg-mingw --noconfirm --noprogressbar --skippgpcheck --nocheck --syncdeps --rmdeps --cleanbuild --sign
+    execute 'Building source' makepkg --noconfirm --noprogressbar --skippgpcheck --allsource --config '/etc/makepkg_mingw64.conf' --sign
     execute 'Installing' yes:pacman --noprogressbar --upgrade *.pkg.tar.xz
-    deploy_enabled && mv "${package}"/*.pkg.tar.xz artifacts
-    deploy_enabled && mv "${package}"/*.src.tar.gz artifacts
+    deploy_enabled && mv "${package}"/*.pkg.tar.xz* artifacts
+    deploy_enabled && mv "${package}"/*.src.tar.gz* artifacts
     unset package
 done
 
