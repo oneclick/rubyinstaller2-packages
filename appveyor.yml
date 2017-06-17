@@ -1,3 +1,8 @@
+init:
+  - echo %PATH%
+  # We use a clean PATH to avoid interferences with the hundreds of installed programs.
+  - set PATH=c:/Ruby24-x64/bin;c:/Program Files/Git/cmd;c:/Windows/system32
+
 environment:
     DEPLOY_PROVIDER: bintray
     BINTRAY_ACCOUNT: larskanis
