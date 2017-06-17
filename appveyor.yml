@@ -7,7 +7,7 @@ environment:
     DEPLOY_PROVIDER: bintray
     BINTRAY_ACCOUNT: larskanis
     BINTRAY_REPOSITORY: rubyinstaller2-packages
-    PACMAN_REPOSITORY_NAME: ci.mingw
+    PACMAN_REPOSITORY_NAME: ci.ri2
     BUILD_URL: https://ci.appveyor.com/project/$(APPVEYOR_ACCOUNT_NAME)/$(APPVEYOR_PROJECT_NAME)/build/$(APPVEYOR_BUILD_VERSION)
 
 build_script:
