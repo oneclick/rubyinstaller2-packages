@@ -20,10 +20,16 @@ pacman-key --recv-keys BE8BF1C5
 pacman-key --lsign-key BE8BF1C5
 
 # Detect
-list_commits  || failure 'Could not detect added commits'
-list_packages || failure 'Could not detect changed files'
-message 'Processing changes' "${commits[@]}"
-test -z "${packages}" && success 'No changes in package recipes'
+if [ -z $APPVEYOR_SCHEDULED_BUILD ]
+then
+    list_commits  || failure 'Could not detect added commits'
+    list_packages || failure 'Could not detect changed files'
+    message 'Processing changes' "${commits[@]}"
+    test -z "${packages}" && success 'No changes in package recipes'
+else
+    # Scheduled build? Build the daily snapshot ruby version.
+    packages=( mingw-w64-ruby25 )
+fi
 define_build_order || failure 'Could not determine build order'
 
 # Build
