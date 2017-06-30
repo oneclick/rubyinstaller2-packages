@@ -14,7 +14,7 @@ git remote add upstream 'https://github.com/oneclick/rubyinstaller2-packages'
 git fetch --quiet upstream
 
 # Decrypt and import private sigature key
-deploy_enabled && (gpg --passphrase $gpgpasswd --decrypt appveyor-key.asc.asc | gpg --import)
+gpg --passphrase $gpgpasswd --decrypt appveyor-key.asc.asc | gpg --import
 # Download and trust public signatur key
 pacman-key --recv-keys BE8BF1C5
 pacman-key --lsign-key BE8BF1C5
