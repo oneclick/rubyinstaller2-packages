@@ -20,9 +20,8 @@ Add these lines to `c:/msys64/etc/pacman.conf` (or wherever MSYS2 is installed):
 Server = http://dl.bintray.com/larskanis/rubyinstaller2-packages
 ```
 
-Then execute this within a MSYS2 shell:
+Then execute this within a MSYS2 shell to download and trust the public signatur key:
 ```sh
-# Download and trust public signatur key
 pacman-key --recv-keys BE8BF1C5
 pacman-key --lsign-key BE8BF1C5
 ```
@@ -30,4 +29,16 @@ pacman-key --lsign-key BE8BF1C5
 You can then install or update MSYS2-MINGW ruby like so:
 ```sh
 pacman -S mingw-w64-x86_64-ruby24
+```
+
+## Build packages for yourself
+Second option is to clone git repository to your machine and build it for yourself.
+Assuming you have a properly installed MSYS2 environment and build tools, you can build any package using the following command:
+```sh
+   cd ${package-name}
+   MINGW_INSTALLS=mingw64 makepkg-mingw -sLf
+```
+After that you can install the freshly built package(s) with the following command:
+```sh
+   pacman -U ${package-name}*.pkg.tar.xz
 ```
