@@ -13,12 +13,6 @@ git_config user.name  'RubyInstaller2 Continuous Integration'
 git remote add upstream 'https://github.com/oneclick/rubyinstaller2-packages'
 git fetch --quiet upstream
 
-# Decrypt and import private sigature key
-deploy_enabled && (gpg --passphrase $gpgpasswd --decrypt appveyor-key.asc.asc | gpg --import)
-# Download and trust public signatur key
-pacman-key --recv-keys BE8BF1C5
-pacman-key --lsign-key BE8BF1C5
-
 # Detect
 if [ -z $APPVEYOR_SCHEDULED_BUILD ]
 then
@@ -31,10 +25,17 @@ else
     packages=( mingw-w64-ruby25 )
 fi
 define_build_order || failure 'Could not determine build order'
+message 'Building packages' "${packages[@]}"
+
+execute 'Updating system' update_system
+
+# Decrypt and import private sigature key
+deploy_enabled && (gpg --passphrase $gpgpasswd --decrypt appveyor-key.asc.asc | gpg --import)
+# Download and trust public signatur key
+pacman-key --recv-keys BE8BF1C5
+pacman-key --lsign-key BE8BF1C5
 
 # Build
-message 'Building packages' "${packages[@]}"
-execute 'Updating system' update_system
 execute 'Approving recipe quality' check_recipe_quality
 for package in "${packages[@]}"; do
     execute 'Building binary' makepkg-mingw --noconfirm --noprogressbar --skippgpcheck --nocheck --syncdeps --rmdeps --cleanbuild --sign
