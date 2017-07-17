@@ -28,7 +28,7 @@ pacman-key --lsign-key BE8BF1C5
 
 You can then install or update MSYS2-MINGW ruby like so:
 ```sh
-pacman -S mingw-w64-x86_64-ruby24
+pacman -Sy mingw-w64-x86_64-ruby24
 ```
 
 ## Build packages for yourself
