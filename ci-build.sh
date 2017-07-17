@@ -38,9 +38,9 @@ pacman-key --lsign-key BE8BF1C5
 # Build
 execute 'Approving recipe quality' check_recipe_quality
 for package in "${packages[@]}"; do
-    execute 'Building binary' makepkg-mingw --noconfirm --noprogressbar --skippgpcheck --nocheck --syncdeps --rmdeps --cleanbuild --sign
-    execute 'Building source' makepkg --noconfirm --noprogressbar --skippgpcheck --allsource --config '/etc/makepkg_mingw64.conf' --sign
-    execute 'Installing' yes:pacman --noprogressbar --upgrade *.pkg.tar.xz
+    execute 'Building binary' makepkg-mingw --noconfirm --skippgpcheck --nocheck --syncdeps --rmdeps --cleanbuild --sign
+    execute 'Building source' makepkg --noconfirm --skippgpcheck --allsource --config '/etc/makepkg_mingw64.conf' --sign
+    execute 'Installing' yes:pacman --upgrade *.pkg.tar.xz
     deploy_enabled && mv "${package}"/*.pkg.tar.xz* artifacts
     deploy_enabled && mv "${package}"/*.src.tar.gz* artifacts
     unset package
