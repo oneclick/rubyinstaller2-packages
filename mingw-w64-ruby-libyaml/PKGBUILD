@@ -1,0 +1,50 @@
+# Maintainer: MSP-Greg
+
+_realname=libyaml
+pkgbase=mingw-w64-ruby-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-ruby-${_realname}")
+pkgver=0.1.7
+pkgrel=1
+pkgdesc="YAML 1.1 library (mingw-w64)"
+url="http://pyyaml.org/wiki/LibYAML"
+license=("MIT")
+arch=('any')
+makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
+             "${MINGW_PACKAGE_PREFIX}-pkg-config")
+options=('staticlibs' 'strip')
+source=(${_realname}-${pkgver}.tar.bz2::https://bitbucket.org/xi/libyaml/get/${pkgver}.tar.bz2
+        "0001-Proper-mingw-YAML_DECLARE-definition.patch"
+        "0002-libyaml-no-undefined.patch")
+sha256sums=('c1b5082f38979a9ab9e3c07ac37eafe4143aeb5ca2acf0dbe636d55e4e3a7757'
+            'b3c137a1d44432edc35e571b479a0f3f0315f664c994ea147f9c4a7167a9857c'
+            '6e26d8ac24052239a1bc2db7e8d9cc28ece490a09c36479ca0209ee890ce387d')
+
+PACKAGER=MSP-Greg
+
+prepare() {
+  cd ${srcdir}/xi-libyaml-*
+  patch -Np1 -i "$srcdir/0001-Proper-mingw-YAML_DECLARE-definition.patch"
+  patch -Np1 -i "$srcdir/0002-libyaml-no-undefined.patch"
+
+  autoreconf -fiv
+}
+
+build() {
+  [[ -d ${srcdir}/build-${CARCH} ]] && rm -rf ${srcdir}/build-${CARCH}
+  mkdir -p ${srcdir}/build-${CARCH} && cd ${srcdir}/build-${CARCH}
+
+  ../xi-libyaml-*/configure \
+    --prefix=${MINGW_PREFIX} \
+    --build=${CARCH} \
+    --host=${CARCH} \
+    --target=${CARCH}
+
+  make
+}
+
+# no tests as of 0.1.7
+
+package() {
+  cd "${srcdir}/build-${CARCH}"
+  make DESTDIR="${pkgdir}" install
+}
