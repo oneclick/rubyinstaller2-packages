@@ -9,7 +9,7 @@ environment:
     BINTRAY_REPOSITORY: rubyinstaller2-packages
     PACMAN_REPOSITORY_NAME: ci.ri2
     BUILD_URL: https://ci.appveyor.com/project/$(APPVEYOR_ACCOUNT_NAME)/$(APPVEYOR_PROJECT_NAME)/build/$(APPVEYOR_BUILD_VERSION)
-    gpgpasswd:
+    GPGPASSWD:
         secure: /DELcKSZC+R4HdXgsqR1RtC+IrDZ3Xut/vzV/KgepE3M8OsjJtmWutN0+Jvc2Iv2
 
 build_script:

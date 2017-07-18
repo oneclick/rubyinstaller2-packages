@@ -30,7 +30,7 @@ message 'Building packages' "${packages[@]}"
 execute 'Updating system' update_system
 
 # Decrypt and import private sigature key
-deploy_enabled && (gpg --passphrase $gpgpasswd --decrypt appveyor-key.asc.asc | gpg --import)
+deploy_enabled && (gpg --passphrase $GPGPASSWD --decrypt appveyor-key.asc.asc | gpg --import)
 # Download and trust public signatur key
 pacman-key --recv-keys BE8BF1C5
 pacman-key --lsign-key BE8BF1C5
