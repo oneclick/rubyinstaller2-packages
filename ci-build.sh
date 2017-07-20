@@ -43,6 +43,7 @@ for package in "${packages[@]}"; do
     execute 'Installing' yes:pacman --upgrade *.pkg.tar.xz
     deploy_enabled && mv "${package}"/*.pkg.tar.xz* artifacts
     deploy_enabled && mv "${package}"/*.src.tar.gz* artifacts
+    deploy_enabled && drop_old_bintray_versions "${package}"
     unset package
 done
 

@@ -7,10 +7,13 @@ environment:
     DEPLOY_PROVIDER: bintray
     BINTRAY_ACCOUNT: larskanis
     BINTRAY_REPOSITORY: rubyinstaller2-packages
+    BINTRAY_VERSION: latest
     PACMAN_REPOSITORY_NAME: ci.ri2
     BUILD_URL: https://ci.appveyor.com/project/$(APPVEYOR_ACCOUNT_NAME)/$(APPVEYOR_PROJECT_NAME)/build/$(APPVEYOR_BUILD_VERSION)
     GPGPASSWD:
         secure: /DELcKSZC+R4HdXgsqR1RtC+IrDZ3Xut/vzV/KgepE3M8OsjJtmWutN0+Jvc2Iv2
+    BINTRAY_API_KEY:
+        secure: yaAnKXWjX6uB9WwCZ4ZQm/R0bCvyribyGYEoTu/kw+F6v8CgJ26n8+u9C6cnuBIN
 
 build_script:
     - C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
@@ -28,5 +31,4 @@ deploy:
       version: latest
       publish: true
       override: true
-      api_key:
-          secure: yaAnKXWjX6uB9WwCZ4ZQm/R0bCvyribyGYEoTu/kw+F6v8CgJ26n8+u9C6cnuBIN
+      api_key: $(BINTRAY_API_KEY)

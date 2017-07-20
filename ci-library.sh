@@ -164,6 +164,31 @@ create_pacman_repository() {
     repo-add --sign --verify "${name}.db.tar.xz" *.pkg.tar.xz
 }
 
+_drop_bintray_files() {
+    local filenames=("${@}")
+    [[ "${DEPLOY_PROVIDER}" = bintray ]] || return 1
+    for filename in "${filenames[@]}"; do
+        echo -n "bintray delete ${filename} "
+        curl -X DELETE "-u${BINTRAY_ACCOUNT}:${BINTRAY_API_KEY}" "https://api.bintray.com/content/${BINTRAY_ACCOUNT}/${BINTRAY_REPOSITORY}/${filename}"
+        echo
+    done
+}
+
+drop_old_bintray_versions() {
+    local package="${1}"
+    local sdate=$(date +%Y-%m-%d)
+    for i in {1..30}; do
+        local rdate=$(date +%Y%m%d -d "${sdate} - $i day")
+
+        if [[ "${package}" = "mingw-w64-ruby25" ]]; then
+          # mingw-w64-i686-ruby25-2.5.0.r20170628-1-any.pkg.tar.xz
+          _drop_bintray_files mingw-w64-{i686,x86_64}-ruby25-2.5.0.r${rdate}-1-any.pkg.tar.xz{,.sig}
+          # mingw-w64-ruby25-2.5.0.r20170712-1.src.tar.gz
+          _drop_bintray_files mingw-w64-ruby25-2.5.0.r${rdate}-1.src.tar.gz{,.sig}
+        fi
+    done
+}
+
 # Deployment is enabled
 deploy_enabled() {
     test -n "${BUILD_URL}" || return 1
