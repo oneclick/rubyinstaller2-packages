@@ -1,0 +1,10 @@
+--- Configurations/unix-Makefile.tmpl.orig	Thu Nov 10 08:03:43 2016
++++ Configurations/unix-Makefile.tmpl	Sat Jan 21 16:07:34 2017
+@@ -262,5 +262,5 @@
+
+-install: install_sw install_ssldirs install_docs
++install: install_sw install_ssldirs
+
+-uninstall: uninstall_docs uninstall_sw
++uninstall: uninstall_sw
+
