@@ -61,12 +61,13 @@ build() {
     -DOPENSSLBIN=\"\\\"${MINGW_PREFIX}/bin\\\"\"
 
   cd "${srcdir}/build-${CARCH}"
-  make -j1 ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend all
+  make ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend -j1
+  make ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include all
 }
 
 check() {
   cd "${srcdir}/build-${CARCH}"
-  make -j1 test
+  make test
 }
 
 package() {
