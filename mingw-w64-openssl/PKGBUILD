@@ -11,7 +11,6 @@ pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Se
 url="https://www.openssl.org"
 license=('BSD')
 arch=('any')
-PACKAGER=MSP-Greg
 
 depends=("${MINGW_PACKAGE_PREFIX}-ca-certificates"
          "${MINGW_PACKAGE_PREFIX}-gcc-libs"
@@ -20,10 +19,12 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('strip' '!buildflags' 'staticlibs')
 noextract=(${_realname}-${_ver}.tar.gz)
 source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz{,.asc}
-        'openssl-1.1.0e-makefile.patch')
+        'openssl-1.1.0e-makefile.patch'
+        'openssl-1.1.0f-relocation.patch')
 sha256sums=('12f746f3f2493b2f39da7ecf63d7ee19c6ac9ec6a4fcd8c229da8a522cb12765'
-            '9F2FEB0494EBCC1CF152D95A11BC966CB94BC1957D88650285DB3966866801B0'
-            '7e1113888ab10413e982fa8d2fbc7b39b54012705a25a0d43b462f0ef8cd1391')
+            'SKIP'
+            '7e1113888ab10413e982fa8d2fbc7b39b54012705a25a0d43b462f0ef8cd1391'
+            'c126a4d2d205877b75546081ee57e71b2e3fa81e75e244dff480b18a589b7ea8')
 
 validpgpkeys=('8657ABB260F056B1E5190839D9C4D26D0E604491')
 
@@ -34,33 +35,30 @@ prepare() {
   cd ${srcdir}/${_realname}-${_ver}
 
   patch -p0 -i ${srcdir}/openssl-1.1.0e-makefile.patch
-
+  patch -p1 -i ${srcdir}/openssl-1.1.0f-relocation.patch
 }
 
 build() {
-  # No support for out-of-source builds
-  mkdir -p ${srcdir}/build-${CARCH}
-  cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
-
-  # Use mingw cflags instead of hardcoded ones
-  sed -i -e '/^"mingw"/ s/-fomit-frame-pointer -O3 -march=i486 -Wall/-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4/' ${srcdir}/build-${CARCH}/Configure
+  # Use new support of out-of-tree builds in OpenSSL-1.1.0
+  [[ -d "${srcdir}/build-${CARCH}" ]] && rm -rf "${srcdir}/build-${CARCH}"
+  mkdir -p "${srcdir}/build-${CARCH}" && cd "${srcdir}/build-${CARCH}"
 
   _mingw=mingw
   if $(echo ${CARCH} | grep -q x86_64); then
     _mingw=mingw64
   fi
-  cd "${srcdir}/build-${CARCH}"
   export MSYS2_ARG_CONV_EXCL="--prefix="
   
-  ./Configure \
+  ../${_realname}-${_ver}/Configure \
     --prefix=${MINGW_PREFIX} \
-    --openssldir=${MINGW_PREFIX} \
+    --openssldir=${MINGW_PREFIX}/ssl \
     --api=1.0.0 \
     ${_mingw} \
     shared \
     zlib-dynamic \
     enable-capieng \
-    -D__MINGW_USE_VC2005_COMPAT
+    -D__MINGW_USE_VC2005_COMPAT \
+    -DOPENSSLBIN=\"\\\"${MINGW_PREFIX}/bin\\\"\"
 
   cd "${srcdir}/build-${CARCH}"
   make -j1 ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend all
