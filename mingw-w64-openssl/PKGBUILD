@@ -80,6 +80,7 @@ package() {
   cd "${srcdir}/build-${CARCH}"
   make DESTDIR="${pkgdir}" MANDIR=${MINGW_PREFIX}/share/man MANSUFFIX=ssl install
   
+  cd ${srcdir}/${_realname}-${_ver}
   install -D -m644 LICENSE ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE
 
   chmod -R 777 "${pkgdir}${MINGW_PREFIX}"/bin
