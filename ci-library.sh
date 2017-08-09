@@ -222,6 +222,30 @@ check_recipe_quality() {
     saneman --format='\t%l:%c %p:%c %m' --verbose --no-terminal "${packages[@]}"
 }
 
+# Add ci.ri2 repository
+add_ci_ri2_repo() {
+    # Download and trust public signatur key
+    pacman-key --recv-keys BE8BF1C5
+    pacman-key --lsign-key BE8BF1C5
+
+    if grep -Fxq "[ci.ri2]" /etc/pacman.conf
+    then
+        echo "[ci.ri2] already in /etc/pacman.conf"
+    else
+        echo "add [ci.ri2] to /etc/pacman.conf"
+        cat >>/etc/pacman.conf <<-EOT
+
+# Added by appveyor build script
+[ci.ri2]
+Server = http://dl.bintray.com/larskanis/rubyinstaller2-packages
+EOT
+    fi
+
+    # Download [ci.ri2] package list
+    pacman --noconfirm --sync --refresh
+    return 0
+}
+
 # Status functions
 failure() { local status="${1}"; local items=("${@:2}"); _status failure "${status}." "${items[@]}"; exit 1; }
 success() { local status="${1}"; local items=("${@:2}"); _status success "${status}." "${items[@]}"; exit 0; }

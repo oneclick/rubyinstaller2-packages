@@ -31,9 +31,7 @@ execute 'Updating system' update_system
 
 # Decrypt and import private sigature key
 deploy_enabled && (gpg --passphrase $GPGPASSWD --decrypt appveyor-key.asc.asc | gpg --import)
-# Download and trust public signatur key
-pacman-key --recv-keys BE8BF1C5
-pacman-key --lsign-key BE8BF1C5
+execute 'Add [ci.ri2] respository' add_ci_ri2_repo
 
 # Build
 execute 'Approving recipe quality' check_recipe_quality
