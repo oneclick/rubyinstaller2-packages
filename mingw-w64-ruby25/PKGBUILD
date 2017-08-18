@@ -16,6 +16,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libffi"
          "${MINGW_PACKAGE_PREFIX}-libyaml"
          "${MINGW_PACKAGE_PREFIX}-openssl>=1.1"
+         "${MINGW_PACKAGE_PREFIX}-ragel"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/snapshot.tar.xz"
