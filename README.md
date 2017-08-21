@@ -14,16 +14,11 @@ In addition the latest ruby-2.5 snapshot is build and uploaded on a daily base.
 Packages from this repository can be downloaded here: https://dl.bintray.com/larskanis/rubyinstaller2-packages/
 
 It is also possible to add the RubyInstaller repository as a pacman repository in your MSYS2 installation.
-Add these lines to `c:/msys64/etc/pacman.conf` (or wherever MSYS2 is installed):
-```ini
-[ci.ri2]
-Server = http://dl.bintray.com/larskanis/rubyinstaller2-packages
-```
-
-Then execute this within a MSYS2 shell to download and trust the public signatur key:
+Execute this within a MSYS2 shell to download and trust the public signatur key and to add the new package source:
 ```sh
 pacman-key --recv-keys BE8BF1C5
 pacman-key --lsign-key BE8BF1C5
+repman add ci.ri2 'http://dl.bintray.com/larskanis/rubyinstaller2-packages'
 ```
 
 You can then install or update MSYS2-MINGW ruby like so:
