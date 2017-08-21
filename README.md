@@ -18,7 +18,7 @@ Execute this within a MSYS2 shell to download and trust the public signatur key 
 ```sh
 pacman-key --recv-keys BE8BF1C5
 pacman-key --lsign-key BE8BF1C5
-repman add ci.ri2 'http://dl.bintray.com/larskanis/rubyinstaller2-packages'
+repman add ci.ri2 "http://dl.bintray.com/larskanis/rubyinstaller2-packages"
 ```
 
 You can then install or update MSYS2-MINGW ruby like so:
