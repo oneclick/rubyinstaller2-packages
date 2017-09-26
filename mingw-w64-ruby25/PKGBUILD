@@ -20,7 +20,6 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/snapshot.tar.xz"
-        0001-Fix-overflow-detection-for-LLP64-arch.patch
         0002-use-gnu-printf.patch
         ruby.ico
         rubyw.ico)
@@ -29,7 +28,6 @@ noextract=("snapshot.tar.xz")
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD.erb"
 
 sha256sums=('SKIP'
-            '1bda935d3a7a4d706104416c2beb85363861c3bea22079567c8204f6db077098'
             '578bd0830fe96efc7656c732ec46b0658fc436a7a30d8945cf3b8240797809f0'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
@@ -37,7 +35,6 @@ sha256sums=('SKIP'
 prepare() {
   bsdtar -xf snapshot.tar.xz || true
   cd ${srcdir}/snapshot
-  patch -p1 -i ${srcdir}/0001-Fix-overflow-detection-for-LLP64-arch.patch
   patch -p1 -i ${srcdir}/0002-use-gnu-printf.patch
 
   autoreconf -fi
