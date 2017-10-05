@@ -28,7 +28,7 @@ noextract=("snapshot.tar.xz")
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD.erb"
 
 sha256sums=('SKIP'
-            '578bd0830fe96efc7656c732ec46b0658fc436a7a30d8945cf3b8240797809f0'
+            'e79d52e71cf6d77e099d2cdc32cbb6c51326e533d7c6829118141a7974dae2f2'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
