@@ -1,0 +1,13 @@
+diff --git a/configure.ac b/configure.ac
+index 8ea969412f..07c72aea77 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1666,7 +1666,7 @@ AC_CACHE_CHECK([for printf prefix for $1], [rb_cv_pri_prefix_]AS_TR_SH($1),[
+ 	    @%:@include <stddef.h>
+             @%:@ifdef __GNUC__
+             @%:@define PRINTF_ARGS(decl, string_index, first_to_check) \
+-              decl __attribute__((format(printf, string_index, first_to_check)))
++              decl __attribute__((format(gnu_printf, string_index, first_to_check)))
+             @%:@else
+             @%:@define PRINTF_ARGS(decl, string_index, first_to_check) decl
+             @%:@endif
