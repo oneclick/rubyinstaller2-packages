@@ -1,7 +1,7 @@
 _realname=ruby
-pkgbase=mingw-w64-ruby25
-pkgname="${MINGW_PACKAGE_PREFIX}-ruby25"
-pkgver=2.5.0.r20170617
+pkgbase=mingw-w64-ruby-trunk
+pkgname="${MINGW_PACKAGE_PREFIX}-ruby-trunk"
+pkgver=2.5.0.r20171218
 pkgver() {
   echo 2.5.0.r`date +%Y%m%d`
 }
