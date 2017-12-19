@@ -3,7 +3,7 @@
 _realname=openssl
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-_ver=1.1.0f
+_ver=1.1.0g
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
 pkgrel=1
@@ -21,7 +21,7 @@ noextract=(${_realname}-${_ver}.tar.gz)
 source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz{,.asc}
         'openssl-1.1.0e-makefile.patch'
         'openssl-1.1.0f-relocation.patch')
-sha256sums=('12f746f3f2493b2f39da7ecf63d7ee19c6ac9ec6a4fcd8c229da8a522cb12765'
+sha256sums=('de4d501267da39310905cb6dc8c6121f7a2cad45a7707f76df828fe1b85073af'
             'SKIP'
             '7e1113888ab10413e982fa8d2fbc7b39b54012705a25a0d43b462f0ef8cd1391'
             'c126a4d2d205877b75546081ee57e71b2e3fa81e75e244dff480b18a589b7ea8')
