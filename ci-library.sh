@@ -180,11 +180,11 @@ drop_old_bintray_versions() {
     for i in {1..30}; do
         local rdate=$(date +%Y%m%d -d "${sdate} - $i day")
 
-        if [[ "${package}" = "mingw-w64-ruby25" ]]; then
-          # mingw-w64-i686-ruby25-2.5.0.r20170628-1-any.pkg.tar.xz
-          _drop_bintray_files mingw-w64-{i686,x86_64}-ruby25-2.5.0.r${rdate}-1-any.pkg.tar.xz{,.sig}
-          # mingw-w64-ruby25-2.5.0.r20170712-1.src.tar.gz
-          _drop_bintray_files mingw-w64-ruby25-2.5.0.r${rdate}-1.src.tar.gz{,.sig}
+        if [[ "${package}" = "mingw-w64-ruby-head" ]]; then
+          # mingw-w64-i686-ruby-head-r20170628-1-any.pkg.tar.xz
+          _drop_bintray_files mingw-w64-{i686,x86_64}-ruby-head.r${rdate}-1-any.pkg.tar.xz{,.sig}
+          # mingw-w64-ruby-head-r20170712-1.src.tar.gz
+          _drop_bintray_files mingw-w64-ruby-head.r${rdate}-1.src.tar.gz{,.sig}
         fi
     done
 }
