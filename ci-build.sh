@@ -22,7 +22,7 @@ then
     test -z "${packages}" && success 'No changes in package recipes'
 else
     # Scheduled build? Build the daily snapshot ruby version.
-    packages=( mingw-w64-ruby-trunk )
+    packages=( mingw-w64-ruby-head )
 fi
 define_build_order || failure 'Could not determine build order'
 message 'Building packages' "${packages[@]}"
