@@ -182,9 +182,9 @@ drop_old_bintray_versions() {
 
         if [[ "${package}" = "mingw-w64-ruby-head" ]]; then
           # mingw-w64-i686-ruby-head-r20170628-1-any.pkg.tar.xz
-          _drop_bintray_files mingw-w64-{i686,x86_64}-ruby-head.r${rdate}-1-any.pkg.tar.xz{,.sig}
+          _drop_bintray_files mingw-w64-{i686,x86_64}-ruby-head-r${rdate}-1-any.pkg.tar.xz{,.sig}
           # mingw-w64-ruby-head-r20170712-1.src.tar.gz
-          _drop_bintray_files mingw-w64-ruby-head.r${rdate}-1.src.tar.gz{,.sig}
+          _drop_bintray_files mingw-w64-ruby-head-r${rdate}-1.src.tar.gz{,.sig}
         fi
     done
 }
