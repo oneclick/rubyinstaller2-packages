@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20171223
+pkgver=r20180119
 pkgver() {
   echo r`date +%Y%m%d`
 }
@@ -28,7 +28,7 @@ noextract=("snapshot.tar.xz")
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD.erb"
 
 sha256sums=('SKIP'
-            'e79d52e71cf6d77e099d2cdc32cbb6c51326e533d7c6829118141a7974dae2f2'
+            '8b60cf0d7aa040eb717d91563821d651a32fcab09789a5aa6fdba0b59156238d'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
