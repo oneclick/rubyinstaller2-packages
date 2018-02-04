@@ -1,4 +1,4 @@
-From 82191d8425ac5976d23b9c19985e0a28a1548ae2 Mon Sep 17 00:00:00 2001
+From 7ef6e7695d2b4b9de479a4683280b1fdf88ecaa8 Mon Sep 17 00:00:00 2001
 From: Lars Kanis <lars@greiz-reinsdorf.de>
 Date: Sun, 4 Feb 2018 23:07:14 +0100
 Subject: [PATCH] MJIT: Determine path of mjit header and libruby at runtime
@@ -19,10 +19,10 @@ mjit.c: Replace constant header and library paths by variable paths
 determined at runtime.
 ---
  Makefile.in        |  2 +-
- mjit.c             | 39 +++++++++++++++++++++++++++++++++++----
+ mjit.c             | 32 ++++++++++++++++++++++++++++----
  ruby.c             |  7 ++++---
  win32/Makefile.sub |  2 +-
- 4 files changed, 41 insertions(+), 9 deletions(-)
+ 4 files changed, 34 insertions(+), 9 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
 index 840e804310..49b0eaef21 100644
@@ -38,15 +38,13 @@ index 840e804310..49b0eaef21 100644
  LDFLAGS = @STATIC@ $(CFLAGS) @LDFLAGS@
  EXTLDFLAGS = @EXTLDFLAGS@
 diff --git a/mjit.c b/mjit.c
-index 28ad5ca917..87b3979044 100644
+index 28ad5ca917..dc8c527b9d 100644
 --- a/mjit.c
 +++ b/mjit.c
-@@ -193,6 +193,12 @@ static int in_jit;
+@@ -193,6 +193,10 @@ static int in_jit;
  /* Defined in the client thread before starting MJIT threads:  */
  /* Used C compiler path.  */
  static const char *cc_path;
-+/* Root path of the running ruby process. Equal to RbConfig::TOPDIR.  */
-+static char *basedir;
 +/* Linker option to enable libruby in the build directory. */
 +static char *libruby_build;
 +/* Linker option to enable libruby in the directory after install. */
@@ -54,7 +52,7 @@ index 28ad5ca917..87b3979044 100644
  /* Name of the header file.  */
  static char *header_file;
  /* Name of the precompiled header file.  */
-@@ -632,10 +638,12 @@ compile_c_to_so(const char *c_file, const char *so_file)
+@@ -632,10 +636,12 @@ compile_c_to_so(const char *c_file, const char *so_file)
      int exit_code;
      static const char *input[] = {NULL, NULL};
      static const char *output[] = {"-o",  NULL, NULL};
@@ -69,11 +67,13 @@ index 28ad5ca917..87b3979044 100644
          LIBRUBYARG_SHARED,
          "-lmsvcrt",
  # ifdef __GNUC__
-@@ -1054,6 +1062,10 @@ static void
+@@ -1054,6 +1060,12 @@ static void
  init_header_filename(void)
  {
      FILE *f;
++    /* Root path of the running ruby process. Equal to RbConfig::TOPDIR.  */
 +    VALUE basedir_val;
++    char *basedir;
 +
 +    basedir_val = rb_const_get(rb_cObject, rb_intern_const("TMP_RUBY_PREFIX"));
 +    basedir = StringValueCStr(basedir_val);
@@ -95,14 +95,12 @@ index 28ad5ca917..87b3979044 100644
          strcat(header_file, "/");
          strcat(header_file, RUBY_MJIT_HEADER_FILE);
          if ((f = fopen(header_file, "r")) == NULL) {
-@@ -1079,6 +1093,20 @@ init_header_filename(void)
+@@ -1077,6 +1091,16 @@ init_header_filename(void)
+         }
+     }
      fclose(f);
- }
- 
++
 +#ifdef _WIN32
-+static void
-+init_linker_params(void)
-+{
 +    libruby_build = xmalloc(2 + strlen(basedir) + 1);
 +    strcpy(libruby_build, "-L");
 +    strcat(libruby_build, basedir);
@@ -110,22 +108,10 @@ index 28ad5ca917..87b3979044 100644
 +    strcpy(libruby_installed, "-L");
 +    strcat(libruby_installed, basedir);
 +    strcat(libruby_installed, "/lib");
-+}
 +#endif
-+
- /* This is called after each fork in the child in to switch off MJIT
-    engine in the child as it does not inherit MJIT threads.  */
- static void
-@@ -1159,6 +1187,9 @@ mjit_init(struct mjit_options *opts)
-         verbose(1, "Failure in MJIT header file name initialization\n");
-         return;
-     }
-+#ifdef _WIN32
-+    init_linker_params();
-+#endif
+ }
  
-     init_list(&unit_queue);
-     init_list(&active_units);
+ /* This is called after each fork in the child in to switch off MJIT
 diff --git a/ruby.c b/ruby.c
 index 925e4cd956..6bc858f2c7 100644
 --- a/ruby.c
