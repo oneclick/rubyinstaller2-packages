@@ -1,0 +1,49 @@
+# Maintainer: Lars Kanis <lars@greiz-reinsdorf.de>
+
+_realname=readline
+pkgbase=mingw-w64-${_realname}
+pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
+pkgver=65.a77222b
+pkgrel=1
+pkgdesc="MinGW port of readline for editing typed command lines (mingw-w64)"
+arch=('any')
+depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
+         "${MINGW_PACKAGE_PREFIX}-termcap")
+makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
+             "git")
+options=('staticlibs' 'strip')
+license=('GPL')
+url="https://github.com/larskanis/readline"
+source=("${_realname}"::"git+https://github.com/larskanis/readline.git")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd ${srcdir}/${_realname}
+  printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+prepare() {
+  cd "${srcdir}/readline"
+  autoconf -f
+
+  # Remove RPATH from shared objects (FS#14366)
+  sed -i 's|-Wl,-rpath,$(libdir) ||g' support/shobj-conf
+}
+
+build() {
+  [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
+  mkdir -p ${srcdir}/build-${MINGW_CHOST} && cd ${srcdir}/build-${MINGW_CHOST}
+  ../${_realname}/configure \
+    --prefix=${MINGW_PREFIX} \
+    --host=${MINGW_CHOST} \
+    --target=${MINGW_CHOST} \
+    --build=${MINGW_CHOST} \
+    --enable-shared \
+    --without-curses
+  make
+}
+
+package() {
+  cd "${srcdir}/build-${MINGW_CHOST}"
+  make install DESTDIR="${pkgdir}"
+}
