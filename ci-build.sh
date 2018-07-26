@@ -30,7 +30,7 @@ message 'Building packages' "${packages[@]}"
 execute 'Updating system' update_system
 
 # Decrypt and import private sigature key
-deploy_enabled && (gpg --passphrase $GPGPASSWD --decrypt appveyor-key.asc.asc | gpg --import)
+deploy_enabled && (gpg --batch --passphrase $GPGPASSWD --decrypt appveyor-key.asc.asc | gpg --import)
 execute 'Add [ci.ri2] respository' add_ci_ri2_repo
 
 # Build
