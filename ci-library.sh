@@ -224,8 +224,8 @@ check_recipe_quality() {
 
 # Add ci.ri2 repository
 add_ci_ri2_repo() {
-    # Download and trust public signatur key
-    pacman-key --recv-keys BE8BF1C5
+    # Trust public signature key
+    gpg --export BE8BF1C5 | pacman-key --add -
     pacman-key --lsign-key BE8BF1C5
 
     if grep -Fxq "[ci.ri2]" /etc/pacman.conf
