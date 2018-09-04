@@ -20,7 +20,6 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/snapshot.tar.xz"
-        0002-use-gnu-printf.patch
         ruby.ico
         rubyw.ico)
 noextract=("snapshot.tar.xz")
@@ -28,14 +27,12 @@ noextract=("snapshot.tar.xz")
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
 sha256sums=('SKIP'
-            '8b60cf0d7aa040eb717d91563821d651a32fcab09789a5aa6fdba0b59156238d'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
 prepare() {
   bsdtar -xf snapshot.tar.xz || true
   cd ${srcdir}/snapshot
-  patch -p1 -i ${srcdir}/0002-use-gnu-printf.patch
 
   autoreconf -fi
 }
