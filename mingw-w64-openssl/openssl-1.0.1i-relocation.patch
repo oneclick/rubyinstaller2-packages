@@ -1,21 +1,23 @@
-diff --git a/crypto/build.info b/crypto/build.info
-index 916d24f..c6ccaf6 100644
---- a/crypto/build.info
-+++ b/crypto/build.info
-@@ -2,7 +2,7 @@
- LIBS=../libcrypto
- SOURCE[../libcrypto]=\
-         cryptlib.c mem.c mem_dbg.c cversion.c ex_data.c cpt_err.c \
--        ebcdic.c uid.c o_time.c o_str.c o_dir.c o_fopen.c \
-+        ebcdic.c uid.c o_time.c o_str.c o_dir.c o_fopen.c pathtools.c \
-         threads_pthread.c threads_win.c threads_none.c \
-         o_init.c o_fips.c mem_sec.c init.c {- $target{cpuid_asm_src} -} \
-         {- $target{uplink_aux_src} -}
-diff --git a/crypto/engine/eng_list.c b/crypto/engine/eng_list.c
-index 934389f..1843508 100644
---- a/crypto/engine/eng_list.c
-+++ b/crypto/engine/eng_list.c
-@@ -14,6 +14,7 @@
+diff -Naur openssl-1.0.1i-orig/Configure openssl-1.0.1i/Configure
+--- openssl-1.0.1i-orig/Configure	2014-08-07 01:10:56.000000000 +0400
++++ openssl-1.0.1i/Configure	2014-08-08 00:23:45.884200000 +0400
+@@ -1900,6 +1900,12 @@
+ 		$foo =~ s/\\/\\\\/g;
+ 		print OUT "#define OPENSSLDIR \"$foo\"\n";
+ 		}
++	elsif	(/^#define\s+OPENSSLBIN/)
++		{
++		my $foo = "$prefix/bin";
++		$foo =~ s/\\/\\\\/g;
++		print OUT "#define OPENSSLBIN \"$foo\"\n";
++		}
+ 	elsif	(/^#define\s+ENGINESDIR/)
+ 		{
+ 		my $foo = "$prefix/$libdir/engines";
+diff -Naur openssl-1.0.1i-orig/crypto/engine/eng_list.c openssl-1.0.1i/crypto/engine/eng_list.c
+--- openssl-1.0.1i-orig/crypto/engine/eng_list.c	2014-07-22 23:41:23.000000000 +0400
++++ openssl-1.0.1i/crypto/engine/eng_list.c	2014-08-08 00:32:40.141000000 +0400
+@@ -63,6 +63,7 @@
   */
  
  #include "eng_int.h"
@@ -23,7 +25,7 @@ index 934389f..1843508 100644
  
  /*
   * The linked-list of pointers to engine types. engine_list_head incorporates
-@@ -35,6 +36,24 @@ static ENGINE *engine_list_tail = NULL;
+@@ -84,6 +85,24 @@
   * cleanup.
   */
  
@@ -48,24 +50,79 @@ index 934389f..1843508 100644
  static void engine_list_cleanup(void)
  {
      ENGINE *iterator = engine_list_head;
-@@ -322,8 +341,10 @@ ENGINE *ENGINE_by_id(const char *id)
-      * Prevent infinite recursion if we're looking for the dynamic engine.
-      */
-     if (strcmp(id, "dynamic")) {
+@@ -371,8 +390,10 @@
+         if ((load_dir = getenv("OPENSSL_ENGINES")) == 0)
+             load_dir = "SSLROOT:[ENGINES]";
+ # else
 -        if ((load_dir = getenv("OPENSSL_ENGINES")) == 0)
 -            load_dir = ENGINESDIR;
 +        if((load_dir = getenv("OPENSSL_ENGINES")) == 0) {
 +            const char * reloc_engines = enginedir_relocation(ENGINESDIR);
 +            load_dir = reloc_engines;
 +        }
+ # endif
          iterator = ENGINE_by_id("dynamic");
          if (!iterator || !ENGINE_ctrl_cmd_string(iterator, "ID", id, 0) ||
-             !ENGINE_ctrl_cmd_string(iterator, "DIR_LOAD", "2", 0) ||
-diff --git a/crypto/pathtools.c b/crypto/pathtools.c
-new file mode 100644
-index 0000000..81ffa7e
---- /dev/null
-+++ b/crypto/pathtools.c
+diff -Naur openssl-1.0.1i-orig/crypto/engine/Makefile openssl-1.0.1i/crypto/engine/Makefile
+--- openssl-1.0.1i-orig/crypto/engine/Makefile	2014-08-07 01:18:34.000000000 +0400
++++ openssl-1.0.1i/crypto/engine/Makefile	2014-08-08 00:41:21.195800000 +0400
+@@ -209,7 +209,7 @@
+ eng_lib.o: ../../include/openssl/stack.h ../../include/openssl/symhacks.h
+ eng_lib.o: ../../include/openssl/x509.h ../../include/openssl/x509_vfy.h
+ eng_lib.o: ../cryptlib.h eng_int.h eng_lib.c
+-eng_list.o: ../../e_os.h ../../include/openssl/asn1.h
++eng_list.o: ../../e_os.h ../../include/openssl/asn1.h ../pathtools.h
+ eng_list.o: ../../include/openssl/bio.h ../../include/openssl/buffer.h
+ eng_list.o: ../../include/openssl/crypto.h ../../include/openssl/e_os2.h
+ eng_list.o: ../../include/openssl/ec.h ../../include/openssl/ecdh.h
+diff -Naur openssl-1.0.1i-orig/crypto/Makefile openssl-1.0.1i/crypto/Makefile
+--- openssl-1.0.1i-orig/crypto/Makefile	2014-08-07 01:18:30.000000000 +0400
++++ openssl-1.0.1i/crypto/Makefile	2014-08-08 00:38:49.430000000 +0400
+@@ -35,9 +35,9 @@
+ 
+ LIB= $(TOP)/libcrypto.a
+ SHARED_LIB= libcrypto$(SHLIB_EXT)
+-LIBSRC=	cryptlib.c mem.c mem_clr.c mem_dbg.c cversion.c ex_data.c cpt_err.c \
++LIBSRC=	cryptlib.c pathtools.c mem.c mem_clr.c mem_dbg.c cversion.c ex_data.c cpt_err.c \
+ 	ebcdic.c uid.c o_time.c o_str.c o_dir.c o_fips.c o_init.c fips_ers.c
+-LIBOBJ= cryptlib.o mem.o mem_dbg.o cversion.o ex_data.o cpt_err.o ebcdic.o \
++LIBOBJ= cryptlib.o pathtools.o mem.o mem_dbg.o cversion.o ex_data.o cpt_err.o ebcdic.o \
+ 	uid.o o_time.o o_str.o o_dir.o o_fips.o o_init.o fips_ers.o $(CPUID_OBJ)
+ 
+ SRC= $(LIBSRC)
+@@ -215,6 +215,7 @@
+ o_str.o: o_str.c o_str.h
+ o_time.o: ../include/openssl/e_os2.h ../include/openssl/opensslconf.h o_time.c
+ o_time.o: o_time.h
++pathtools.o: pathtools.h
+ uid.o: ../include/openssl/crypto.h ../include/openssl/e_os2.h
+ uid.o: ../include/openssl/opensslconf.h ../include/openssl/opensslv.h
+ uid.o: ../include/openssl/ossl_typ.h ../include/openssl/safestack.h
+diff -Naur openssl-1.0.1i-orig/crypto/opensslconf.h openssl-1.0.1i/crypto/opensslconf.h
+--- openssl-1.0.1i-orig/crypto/opensslconf.h	2014-08-07 01:18:45.000000000 +0400
++++ openssl-1.0.1i/crypto/opensslconf.h	2014-08-08 00:26:43.479000000 +0400
+@@ -101,6 +101,7 @@
+ 
+ #if !(defined(VMS) || defined(__VMS)) /* VMS uses logical names instead */
+ #if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
++#define OPENSSLDIR "/usr/local/bin"
+ #define ENGINESDIR "/usr/local/ssl/lib/engines"
+ #define OPENSSLDIR "/usr/local/ssl"
+ #endif
+diff -Naur openssl-1.0.1i-orig/crypto/opensslconf.h.in openssl-1.0.1i/crypto/opensslconf.h.in
+--- openssl-1.0.1i-orig/crypto/opensslconf.h.in	2014-07-22 23:41:23.000000000 +0400
++++ openssl-1.0.1i/crypto/opensslconf.h.in	2014-08-08 00:23:04.091800000 +0400
+@@ -5,6 +5,7 @@
+ 
+ #if !(defined(VMS) || defined(__VMS)) /* VMS uses logical names instead */
+ #if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
++#define OPENSSLBIN "/usr/local/bin"
+ #define ENGINESDIR "/usr/local/lib/engines"
+ #define OPENSSLDIR "/usr/local/ssl"
+ #endif
+diff -Naur openssl-1.0.1i-orig/crypto/pathtools.c openssl-1.0.1i/crypto/pathtools.c
+--- openssl-1.0.1i-orig/crypto/pathtools.c	1970-01-01 03:00:00.000000000 +0300
++++ openssl-1.0.1i/crypto/pathtools.c	2014-08-08 09:30:52.000000000 +0400
 @@ -0,0 +1,499 @@
 +/*
 +      .Some useful path tools.
@@ -566,66 +623,9 @@ index 0000000..81ffa7e
 +  free ((void*)arr);
 +  return result;
 +}
-diff --git a/crypto/x509/x509_def.c b/crypto/x509/x509_def.c
-index d11358e..9bf8af0 100644
---- a/crypto/x509/x509_def.c
-+++ b/crypto/x509/x509_def.c
-@@ -9,27 +9,46 @@
- 
- #include <stdio.h>
- #include "internal/cryptlib.h"
-+#include "pathtools.h"
- #include <openssl/crypto.h>
- #include <openssl/x509.h>
- 
-+char * openssl_relocation(const char *path)
-+{
-+#if defined(__MINGW32__)
-+  char exe_path[PATH_MAX];
-+  get_executable_path (NULL, &exe_path[0], sizeof(exe_path)/sizeof(exe_path[0]));
-+  if (strrchr (exe_path, '/') != NULL)
-+  {
-+     strrchr (exe_path, '/')[1] = '\0';
-+  }
-+  char * rel_to_datadir = get_relative_path (OPENSSLBIN, path);
-+  strcat (exe_path, rel_to_datadir);
-+  simplify_path (&exe_path[0]);
-+  return malloc_copy_string(exe_path);
-+#else
-+  return malloc_copy_string(path);
-+#endif
-+}
-+
- const char *X509_get_default_private_dir(void)
- {
--    return (X509_PRIVATE_DIR);
-+    return openssl_relocation(X509_PRIVATE_DIR);
- }
- 
- const char *X509_get_default_cert_area(void)
- {
--    return (X509_CERT_AREA);
-+    return openssl_relocation(X509_CERT_AREA);
- }
- 
- const char *X509_get_default_cert_dir(void)
- {
--    return (X509_CERT_DIR);
-+    return openssl_relocation(X509_CERT_DIR);
- }
- 
- const char *X509_get_default_cert_file(void)
- {
--    return (X509_CERT_FILE);
-+    return openssl_relocation(X509_CERT_FILE);
- }
- 
- const char *X509_get_default_cert_dir_env(void)
-diff --git a/pathtools.h b/pathtools.h
-new file mode 100644
-index 0000000..a8a2928
---- /dev/null
-+++ b/pathtools.h
+diff -urN old/pathtools.h new/pathtools.h
+--- old/pathtools.h	1970-01-01 01:00:00.000000000 +0100
++++ new/pathtools.h	2014-08-28 18:40:03.939064600 +0100
 @@ -0,0 +1,49 @@
 +/*
 +      .Some useful path tools.
@@ -676,3 +676,69 @@ index 0000000..a8a2928
 +char * get_relocated_path_list(char const * from, char const * to_path_list);
 +
 +#endif /* PATHTOOLS_H */
+diff -Naur openssl-1.0.1i-orig/crypto/x509/Makefile openssl-1.0.1i/crypto/x509/Makefile
+--- openssl-1.0.1i-orig/crypto/x509/Makefile	2014-08-07 01:18:39.000000000 +0400
++++ openssl-1.0.1i/crypto/x509/Makefile	2014-08-08 00:39:56.382600000 +0400
+@@ -153,7 +153,7 @@
+ x509_d2.o: ../../include/openssl/stack.h ../../include/openssl/symhacks.h
+ x509_d2.o: ../../include/openssl/x509.h ../../include/openssl/x509_vfy.h
+ x509_d2.o: ../cryptlib.h x509_d2.c
+-x509_def.o: ../../e_os.h ../../include/openssl/asn1.h
++x509_def.o: ../../e_os.h ../../include/openssl/asn1.h ../pathtools.h
+ x509_def.o: ../../include/openssl/bio.h ../../include/openssl/buffer.h
+ x509_def.o: ../../include/openssl/crypto.h ../../include/openssl/e_os2.h
+ x509_def.o: ../../include/openssl/ec.h ../../include/openssl/ecdh.h
+diff -Naur openssl-1.0.1i-orig/crypto/x509/x509_def.c openssl-1.0.1i/crypto/x509/x509_def.c
+--- openssl-1.0.1i-orig/crypto/x509/x509_def.c	2014-07-22 23:41:23.000000000 +0400
++++ openssl-1.0.1i/crypto/x509/x509_def.c	2014-08-08 00:28:13.366200000 +0400
+@@ -58,27 +58,46 @@
+ 
+ #include <stdio.h>
+ #include "cryptlib.h"
++#include "pathtools.h"
+ #include <openssl/crypto.h>
+ #include <openssl/x509.h>
+ 
++char * openssl_relocation(const char *path)
++{
++#if defined(__MINGW32__)
++  char exe_path[PATH_MAX];
++  get_executable_path (NULL, &exe_path[0], sizeof(exe_path)/sizeof(exe_path[0]));
++  if (strrchr (exe_path, '/') != NULL)
++  {
++     strrchr (exe_path, '/')[1] = '\0';
++  }
++  char * rel_to_datadir = get_relative_path (OPENSSLBIN, path);
++  strcat (exe_path, rel_to_datadir);
++  simplify_path (&exe_path[0]);
++  return malloc_copy_string(exe_path);
++#else
++  return malloc_copy_string(path);
++#endif
++}
++
+ const char *X509_get_default_private_dir(void)
+ {
+-    return (X509_PRIVATE_DIR);
++    return openssl_relocation(X509_PRIVATE_DIR);
+ }
+ 
+ const char *X509_get_default_cert_area(void)
+ {
+-    return (X509_CERT_AREA);
++    return openssl_relocation(X509_CERT_AREA);
+ }
+ 
+ const char *X509_get_default_cert_dir(void)
+ {
+-    return (X509_CERT_DIR);
++    return openssl_relocation(X509_CERT_DIR);
+ }
+ 
+ const char *X509_get_default_cert_file(void)
+ {
+-    return (X509_CERT_FILE);
++    return openssl_relocation(X509_CERT_FILE);
+ }
+ 
+ const char *X509_get_default_cert_dir_env(void)
