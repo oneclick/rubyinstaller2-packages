@@ -51,7 +51,8 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --with-out-ext=readline,pty,syslog
+    --with-out-ext=readline,pty,syslog \
+    debugflags=
 
   make showflags main
   echo "Generate HTML documentation"
