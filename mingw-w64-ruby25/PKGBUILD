@@ -57,7 +57,7 @@ build() {
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
     --with-out-ext=pty,syslog \
-    debugflags=
+    "LDFLAGS=-pipe -s"
 
   make showflags main
   echo "Generate HTML documentation"
