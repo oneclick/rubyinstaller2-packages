@@ -2,6 +2,12 @@ init:
   - echo %PATH%
   # We use a clean PATH to avoid interferences with the hundreds of installed programs.
   - set PATH=c:/Ruby24-x64/bin;c:/Program Files/Git/cmd;c:/Windows/system32
+  # Remove troublesome files from Windows system directory
+  - dir c:\windows\system32\l*.dll
+  - del c:\windows\system32\libcrypto-1_1-x64.dll c:\windows\system32\libssl-1_1-x64.dll
+  # Since system32 is a per-platform-directory, we need to execute the commands through a 32 bit cmd to remove the x86 versions
+  - c:\windows\syswow64\cmd.exe /c "dir c:\windows\system32\l*.dll"
+  - c:\windows\syswow64\cmd.exe /c "del c:\windows\system32\libcrypto-1_1.dll c:\windows\system32\libssl-1_1.dll"
 
 environment:
     DEPLOY_PROVIDER: bintray

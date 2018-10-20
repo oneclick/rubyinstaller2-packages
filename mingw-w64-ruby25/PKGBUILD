@@ -85,4 +85,3 @@ package() {
   cp -r .ext/html \
     ${pkgdir}${MINGW_PREFIX}/share/doc/ruby/
 }
-
