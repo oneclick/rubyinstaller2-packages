@@ -148,7 +148,7 @@ define_build_order() {
 create_build_references() {
     local repository_name="${1}"
     local references="${repository_name}.builds"
-    _download_previous "${references}" || touch "${references}"
+    _download_previous "${references}" || failure "Download ${references} failed"
     for file in *; do
         sed -i "/^${file}.*/d" "${references}"
         printf '%-80s%s\n' "${file}" "${BUILD_URL}" >> "${references}"
