@@ -22,6 +22,8 @@ environment:
         secure: yaAnKXWjX6uB9WwCZ4ZQm/R0bCvyribyGYEoTu/kw+F6v8CgJ26n8+u9C6cnuBIN
 
 build_script:
+    # Remove gcc-ada and gcc-objc, since they are no longer supported by msys2 and therefore cause a dependency issue
+    - C:\msys64\usr\bin\pacman --noconfirm --remove mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-objc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-objc
     - C:\msys64\usr\bin\pacman --noconfirm --ask 20 --sync --refresh --refresh --sysupgrade --sysupgrade
     - C:\msys64\usr\bin\bash --login -c "$(cygpath ${APPVEYOR_BUILD_FOLDER})/ci-build.sh"
 
