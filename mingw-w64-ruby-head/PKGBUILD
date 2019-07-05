@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20180516
+pkgver=r20190705
 pkgver() {
   echo r`date +%Y%m%d`
 }
@@ -22,14 +22,16 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/snapshot.tar.xz"
         0001-Fix-build-on-32-bit-mingw-with-gcc-7.4.0.patch
+        0002-Only-use-ucontext-if-it-s-available.patch
         ruby.ico
         rubyw.ico)
 noextract=("snapshot.tar.xz")
 
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
-sha256sums=('SKIP'
+sha256sums=('e5a9bdb982eaec3b2a1cec480aaf691c57ab336f1a06f04f98aac9dba9ffeaf6'
             '1155c7bdd9580e5c5c3de3fbb841431193a78118cb0df2c8e4ced6791b41fa72'
+            '5e60fba123e3c00e061cae400fb4d582cb6600a1eac638aa1c4aaa0849b46a34'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
@@ -37,6 +39,7 @@ prepare() {
   bsdtar -xf snapshot.tar.xz || true
   cd ${srcdir}/snapshot
   patch -p1 -i ${srcdir}/0001-Fix-build-on-32-bit-mingw-with-gcc-7.4.0.patch
+  patch -p1 -i ${srcdir}/0002-Only-use-ucontext-if-it-s-available.patch
 
   autoreconf -fi
 }
