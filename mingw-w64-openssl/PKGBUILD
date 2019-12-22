@@ -88,4 +88,3 @@ package() {
   rm -rf "${pkgdir}${MINGW_PREFIX}"/bin/c_rehash
   rm -rf "${pkgdir}${MINGW_PREFIX}"/{ssl/misc,ssl/man}
 }
-
