@@ -52,7 +52,7 @@ build() {
   cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
 
   # Use mingw cflags instead of hardcoded ones
-  sed -i -e '/^"mingw"/ s/-fomit-frame-pointer -O3 -march=i486 -Wall/-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4/' ${srcdir}/build-${CARCH}/Configure
+  sed -i -e '/^"mingw"/ s/-fomit-frame-pointer -O3 -march=i486 -Wall/-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong -fexceptions --param=ssp-buffer-size=4/' ${srcdir}/build-${CARCH}/Configure
 
   _mingw=mingw
   if $(echo ${CARCH} | grep -q x86_64); then
