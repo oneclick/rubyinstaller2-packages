@@ -1,3 +1,12 @@
 */src
 */pkg
 */*.tar.bz2
+*.log
+*.log.*
+*.tar.xz
+*.tar.xz.asc
+*.tar.gz
+*.tar.gz.asc
+logpipe.*
+appveyor-key.asc
+appveyor-key.asc.gpg
