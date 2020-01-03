@@ -16,7 +16,6 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-gmp"
          "${MINGW_PACKAGE_PREFIX}-libffi"
          "${MINGW_PACKAGE_PREFIX}-libyaml"
-         "${MINGW_PACKAGE_PREFIX}-readline"
          "${MINGW_PACKAGE_PREFIX}-openssl>=1.1"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
@@ -58,7 +57,7 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --with-out-ext=pty,syslog
+    --with-out-ext=readline,pty,syslog
 
   make showflags main
   echo "Generate HTML documentation"
