@@ -35,5 +35,5 @@ Assuming you have a properly installed MSYS2 environment and build tools, you ca
 ```
 After that you can install the freshly built package(s) with the following command:
 ```sh
-   pacman -U ${package-name}*.pkg.tar.xz
+   pacman -U ${package-name}*.pkg.tar.zst
 ```
