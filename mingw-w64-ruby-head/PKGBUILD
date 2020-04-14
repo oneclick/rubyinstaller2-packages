@@ -57,9 +57,9 @@ build() {
     --with-out-ext=readline,pty,syslog
 
   make showflags main
-  echo "Generate HTML documentation"
+  echo "Generate RI and HTML documentation"
   # Make rdoc outputs so many lines -> print dots only
-  make html 2>&1 | ./miniruby -ne "STDERR.print '.'"
+  make rdoc html 2>&1 | ./miniruby -ne "STDERR.print '.'"
 }
 
 check() {
@@ -72,14 +72,10 @@ check() {
 
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
-  make -f GNUMakefile DESTDIR="${pkgdir}" install-nodoc
+  make -f GNUMakefile DESTDIR="${pkgdir}" install
   for script in {erb,gem,irb,rdoc,ri}; do
     install ${srcdir}/snapshot/bin/${script} \
       ${pkgdir}${MINGW_PREFIX}/bin/
   done
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/doc/ruby/
-  cp -r .ext/html \
-    ${pkgdir}${MINGW_PREFIX}/share/doc/ruby/
 }
 
