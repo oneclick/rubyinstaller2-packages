@@ -80,5 +80,8 @@ package() {
     install ${srcdir}/ruby-${pkgver2}/bin/${script} \
       ${pkgdir}${MINGW_PREFIX}/bin/
   done
-}
 
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/doc/ruby/
+  cp -r .ext/html \
+    ${pkgdir}${MINGW_PREFIX}/share/doc/ruby/
+}
