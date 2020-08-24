@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20191105
+pkgver=r20200824
 pkgver() {
   echo r`date +%Y%m%d`
 }
@@ -20,6 +20,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/snapshot.tar.xz"
+        0003-include-erb-executable.patch
         ruby.ico
         rubyw.ico)
 noextract=("snapshot.tar.xz")
@@ -28,12 +29,15 @@ noextract=("snapshot.tar.xz")
 # and set first entry to 'SKIP'
 
 sha256sums=('SKIP'
+            '5e734560f20dd1f991d54230b0b8acfcc7843d345d1588b324dafb19a64ea0ac'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
 prepare() {
   bsdtar -xf snapshot.tar.xz || true
   cd ${srcdir}/snapshot
+
+  patch -p1 -i ${srcdir}/0003-include-erb-executable.patch
 
   autoreconf -fi
 }
