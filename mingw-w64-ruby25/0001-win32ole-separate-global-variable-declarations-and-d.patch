@@ -1,0 +1,273 @@
+From f1699314147bad2cf5550cc582693424fdbc2510 Mon Sep 17 00:00:00 2001
+From: Nobuyoshi Nakada <nobu@ruby-lang.org>
+Date: Sun, 10 May 2020 21:35:54 +0900
+Subject: [PATCH] win32ole: separate global variable declarations and
+ definitions
+
+https://gcc.gnu.org/gcc-10/changes.html#c
+
+> * GCC now defaults to `-fno-common`.  As a result, global
+>   variable accesses are more efficient on various targets.  In
+>   C, global variables with multiple tentative definitions now
+>   result in linker errors.  With `-fcommon` such definitions are
+>   silently merged during linking.
+---
+ ext/win32ole/win32ole.c           | 1 +
+ ext/win32ole/win32ole.h           | 4 ++--
+ ext/win32ole/win32ole_error.c     | 3 +++
+ ext/win32ole/win32ole_error.h     | 4 ++--
+ ext/win32ole/win32ole_method.c    | 2 ++
+ ext/win32ole/win32ole_method.h    | 2 +-
+ ext/win32ole/win32ole_record.c    | 2 ++
+ ext/win32ole/win32ole_record.h    | 2 +-
+ ext/win32ole/win32ole_type.c      | 2 ++
+ ext/win32ole/win32ole_type.h      | 2 +-
+ ext/win32ole/win32ole_typelib.c   | 2 ++
+ ext/win32ole/win32ole_typelib.h   | 2 +-
+ ext/win32ole/win32ole_variable.c  | 2 ++
+ ext/win32ole/win32ole_variable.h  | 2 +-
+ ext/win32ole/win32ole_variant.c   | 2 ++
+ ext/win32ole/win32ole_variant.h   | 2 +-
+ ext/win32ole/win32ole_variant_m.c | 2 ++
+ ext/win32ole/win32ole_variant_m.h | 2 +-
+ 18 files changed, 29 insertions(+), 11 deletions(-)
+
+diff --git a/ext/win32ole/win32ole.c b/ext/win32ole/win32ole.c
+index 4b55f6ea54..4f4550c5b9 100644
+--- a/ext/win32ole/win32ole.c
++++ b/ext/win32ole/win32ole.c
+@@ -3962,6 +3962,7 @@ check_nano_server(void)
+     }
+ }
+ 
++LCID cWIN32OLE_lcid;
+ 
+ void
+ Init_win32ole(void)
+diff --git a/ext/win32ole/win32ole.h b/ext/win32ole/win32ole.h
+index c019930397..cd627ef765 100644
+--- a/ext/win32ole/win32ole.h
++++ b/ext/win32ole/win32ole.h
+@@ -112,8 +112,8 @@ struct oledata {
+     IDispatch *pDispatch;
+ };
+ 
+-VALUE cWIN32OLE;
+-LCID cWIN32OLE_lcid;
++extern VALUE cWIN32OLE;
++extern LCID cWIN32OLE_lcid;
+ 
+ struct oledata *oledata_get_struct(VALUE obj);
+ LPWSTR ole_vstr2wc(VALUE vstr);
+diff --git a/ext/win32ole/win32ole_error.c b/ext/win32ole/win32ole_error.c
+index 022527617e..2bb5156263 100644
+--- a/ext/win32ole/win32ole_error.c
++++ b/ext/win32ole/win32ole_error.c
+@@ -60,6 +60,9 @@ ole_raise(HRESULT hr, VALUE ecs, const char *fmt, ...)
+     rb_exc_raise(rb_exc_new_str(ecs, msg));
+ }
+ 
++VALUE eWIN32OLERuntimeError;
++VALUE eWIN32OLEQueryInterfaceError;
++
+ void
+ Init_win32ole_error(void)
+ {
+diff --git a/ext/win32ole/win32ole_error.h b/ext/win32ole/win32ole_error.h
+index 296eb101ad..a2f329856f 100644
+--- a/ext/win32ole/win32ole_error.h
++++ b/ext/win32ole/win32ole_error.h
+@@ -1,8 +1,8 @@
+ #ifndef WIN32OLE_ERROR_H
+ #define WIN32OLE_ERROR_H 1
+ 
+-VALUE eWIN32OLERuntimeError;
+-VALUE eWIN32OLEQueryInterfaceError;
++extern VALUE eWIN32OLERuntimeError;
++extern VALUE eWIN32OLEQueryInterfaceError;
+ NORETURN(PRINTF_ARGS(void ole_raise(HRESULT hr, VALUE ecs, const char *fmt, ...), 3, 4));
+ void Init_win32ole_error(void);
+ 
+diff --git a/ext/win32ole/win32ole_method.c b/ext/win32ole/win32ole_method.c
+index ffa9324657..bf668300c2 100644
+--- a/ext/win32ole/win32ole_method.c
++++ b/ext/win32ole/win32ole_method.c
+@@ -923,6 +923,8 @@ folemethod_inspect(VALUE self)
+     return default_inspect(self, "WIN32OLE_METHOD");
+ }
+ 
++VALUE cWIN32OLE_METHOD;
++
+ void Init_win32ole_method(void)
+ {
+     cWIN32OLE_METHOD = rb_define_class("WIN32OLE_METHOD", rb_cObject);
+diff --git a/ext/win32ole/win32ole_method.h b/ext/win32ole/win32ole_method.h
+index ff2898ebeb..ef907d2fac 100644
+--- a/ext/win32ole/win32ole_method.h
++++ b/ext/win32ole/win32ole_method.h
+@@ -7,7 +7,7 @@ struct olemethoddata {
+     UINT index;
+ };
+ 
+-VALUE cWIN32OLE_METHOD;
++extern VALUE cWIN32OLE_METHOD;
+ VALUE folemethod_s_allocate(VALUE klass);
+ VALUE ole_methods_from_typeinfo(ITypeInfo *pTypeInfo, int mask);
+ VALUE create_win32ole_method(ITypeInfo *pTypeInfo, VALUE name);
+diff --git a/ext/win32ole/win32ole_record.c b/ext/win32ole/win32ole_record.c
+index e8838832a7..03523bc47d 100644
+--- a/ext/win32ole/win32ole_record.c
++++ b/ext/win32ole/win32ole_record.c
+@@ -589,6 +589,8 @@ folerecord_inspect(VALUE self)
+                       field);
+ }
+ 
++VALUE cWIN32OLE_RECORD;
++
+ void
+ Init_win32ole_record(void)
+ {
+diff --git a/ext/win32ole/win32ole_record.h b/ext/win32ole/win32ole_record.h
+index ea431e91f7..ab1df0ee7f 100644
+--- a/ext/win32ole/win32ole_record.h
++++ b/ext/win32ole/win32ole_record.h
+@@ -1,7 +1,7 @@
+ #ifndef WIN32OLE_RECORD_H
+ #define WIN32OLE_RECORD_H 1
+ 
+-VALUE cWIN32OLE_RECORD;
++extern VALUE cWIN32OLE_RECORD;
+ void ole_rec2variant(VALUE rec, VARIANT *var);
+ void olerecord_set_ivar(VALUE obj, IRecordInfo *pri, void *prec);
+ VALUE create_win32ole_record(IRecordInfo *pri, void *prec);
+diff --git a/ext/win32ole/win32ole_type.c b/ext/win32ole/win32ole_type.c
+index e6ac402ecf..fa39bf3696 100644
+--- a/ext/win32ole/win32ole_type.c
++++ b/ext/win32ole/win32ole_type.c
+@@ -883,6 +883,8 @@ foletype_inspect(VALUE self)
+     return default_inspect(self, "WIN32OLE_TYPE");
+ }
+ 
++VALUE cWIN32OLE_TYPE;
++
+ void Init_win32ole_type(void)
+ {
+     cWIN32OLE_TYPE = rb_define_class("WIN32OLE_TYPE", rb_cObject);
+diff --git a/ext/win32ole/win32ole_type.h b/ext/win32ole/win32ole_type.h
+index a26bf3e043..87b551e502 100644
+--- a/ext/win32ole/win32ole_type.h
++++ b/ext/win32ole/win32ole_type.h
+@@ -1,6 +1,6 @@
+ #ifndef WIN32OLE_TYPE_H
+ #define WIN32OLE_TYPE_H 1
+-VALUE cWIN32OLE_TYPE;
++extern VALUE cWIN32OLE_TYPE;
+ VALUE create_win32ole_type(ITypeInfo *pTypeInfo, VALUE name);
+ ITypeInfo *itypeinfo(VALUE self);
+ VALUE ole_type_from_itypeinfo(ITypeInfo *pTypeInfo);
+diff --git a/ext/win32ole/win32ole_typelib.c b/ext/win32ole/win32ole_typelib.c
+index 35376c644b..d89f181e07 100644
+--- a/ext/win32ole/win32ole_typelib.c
++++ b/ext/win32ole/win32ole_typelib.c
+@@ -822,6 +822,8 @@ foletypelib_inspect(VALUE self)
+     return default_inspect(self, "WIN32OLE_TYPELIB");
+ }
+ 
++VALUE cWIN32OLE_TYPELIB;
++
+ void
+ Init_win32ole_typelib(void)
+ {
+diff --git a/ext/win32ole/win32ole_typelib.h b/ext/win32ole/win32ole_typelib.h
+index 9fc117fcb4..2c2730bb58 100644
+--- a/ext/win32ole/win32ole_typelib.h
++++ b/ext/win32ole/win32ole_typelib.h
+@@ -1,7 +1,7 @@
+ #ifndef WIN32OLE_TYPELIB_H
+ #define WIN32OLE_TYPELIB_H 1
+ 
+-VALUE cWIN32OLE_TYPELIB;
++extern VALUE cWIN32OLE_TYPELIB;
+ 
+ void Init_win32ole_typelib(void);
+ ITypeLib * itypelib(VALUE self);
+diff --git a/ext/win32ole/win32ole_variable.c b/ext/win32ole/win32ole_variable.c
+index 3dc9972ee7..803083156c 100644
+--- a/ext/win32ole/win32ole_variable.c
++++ b/ext/win32ole/win32ole_variable.c
+@@ -365,6 +365,8 @@ folevariable_inspect(VALUE self)
+     return make_inspect("WIN32OLE_VARIABLE", detail);
+ }
+ 
++VALUE cWIN32OLE_VARIABLE;
++
+ void Init_win32ole_variable(void)
+ {
+     cWIN32OLE_VARIABLE = rb_define_class("WIN32OLE_VARIABLE", rb_cObject);
+diff --git a/ext/win32ole/win32ole_variable.h b/ext/win32ole/win32ole_variable.h
+index 704dc13508..209613fd44 100644
+--- a/ext/win32ole/win32ole_variable.h
++++ b/ext/win32ole/win32ole_variable.h
+@@ -1,7 +1,7 @@
+ #ifndef WIN32OLE_VARIABLE_H
+ #define WIN32OLE_VARIABLE_H 1
+ 
+-VALUE cWIN32OLE_VARIABLE;
++extern VALUE cWIN32OLE_VARIABLE;
+ VALUE create_win32ole_variable(ITypeInfo *pTypeInfo, UINT index, VALUE name);
+ void Init_win32ole_variable(void);
+ 
+diff --git a/ext/win32ole/win32ole_variant.c b/ext/win32ole/win32ole_variant.c
+index 3ff8f4ffbf..93f0636593 100644
+--- a/ext/win32ole/win32ole_variant.c
++++ b/ext/win32ole/win32ole_variant.c
+@@ -689,6 +689,8 @@ ole_variant2variant(VALUE val, VARIANT *var)
+     VariantCopy(var, &(pvar->var));
+ }
+ 
++VALUE cWIN32OLE_VARIANT;
++
+ void
+ Init_win32ole_variant(void)
+ {
+diff --git a/ext/win32ole/win32ole_variant.h b/ext/win32ole/win32ole_variant.h
+index efe7ea8bef..4bd3b0aeea 100644
+--- a/ext/win32ole/win32ole_variant.h
++++ b/ext/win32ole/win32ole_variant.h
+@@ -1,7 +1,7 @@
+ #ifndef WIN32OLE_VARIANT_H
+ #define WIN32OLE_VARIANT_H 1
+ 
+-VALUE cWIN32OLE_VARIANT;
++extern VALUE cWIN32OLE_VARIANT;
+ void ole_variant2variant(VALUE val, VARIANT *var);
+ void Init_win32ole_variant(void);
+ 
+diff --git a/ext/win32ole/win32ole_variant_m.c b/ext/win32ole/win32ole_variant_m.c
+index 4d76fdc790..145c08a16e 100644
+--- a/ext/win32ole/win32ole_variant_m.c
++++ b/ext/win32ole/win32ole_variant_m.c
+@@ -1,5 +1,7 @@
+ #include "win32ole.h"
+ 
++VALUE mWIN32OLE_VARIANT;
++
+ void Init_win32ole_variant_m(void)
+ {
+     /*
+diff --git a/ext/win32ole/win32ole_variant_m.h b/ext/win32ole/win32ole_variant_m.h
+index afbef30218..6272a6578f 100644
+--- a/ext/win32ole/win32ole_variant_m.h
++++ b/ext/win32ole/win32ole_variant_m.h
+@@ -1,7 +1,7 @@
+ #ifndef WIN32OLE_VARIANT_M_H
+ #define WIN32OLE_VARIANT_M_H 1
+ 
+-VALUE mWIN32OLE_VARIANT;
++extern VALUE mWIN32OLE_VARIANT;
+ void Init_win32ole_variant_m(void);
+ 
+ #endif
+-- 
+2.12.2.windows.2
+
