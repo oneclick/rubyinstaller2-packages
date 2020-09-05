@@ -5,7 +5,7 @@ pkgname="${MINGW_PACKAGE_PREFIX}-ruby27"
 pkgver2=2.7.1
 # version used by pacman
 pkgver="${pkgver2/-/.}"
-pkgrel=1
+pkgrel=2
 pkgdesc="An object-oriented language for quick and easy programming (mingw-w64)"
 arch=('any')
 url="https://www.ruby-lang.org/en"
@@ -20,17 +20,21 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
+        0001-win32ole-separate-global-variable-declarations-and-d.patch
         ruby.ico
         rubyw.ico)
 
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
 sha256sums=('b224f9844646cc92765df8288a46838511c1cec5b550d8874bd4686a904fcee7'
+            'ab6784915e81f731aed8498320fe468767be6e5b3fa3586b997d20fb09aa5154'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver2}
+
+  patch -p1 -i ${srcdir}/0001-win32ole-separate-global-variable-declarations-and-d.patch
 
   autoreconf -fi
 }
