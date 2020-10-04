@@ -36,6 +36,9 @@ build_script:
     # Kill all running msys2 binaries to avoid error "size of shared memory region changed".
     # See https://github.com/msys2/MSYS2-packages/issues/258
     - powershell -Command "Get-Process | Where-Object {$_.path -like 'C:\msys64*'} | Stop-Process"
+    # Avoid repo.msys2.org since it's down currently
+    - c:\msys64\usr\bin\bash -lc "sed -e \"/repo.msys2.org/ s/Server/#Server/\" -i /etc/pacman.d/mirrorlist.*"
+    - c:\msys64\usr\bin\bash -lc "cat /etc/pacman.d/mirrorlist.*"
     - C:\msys64\usr\bin\bash --login -c "$(cygpath ${APPVEYOR_BUILD_FOLDER})/ci-build.sh"
 
 artifacts:
