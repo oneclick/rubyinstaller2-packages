@@ -22,6 +22,9 @@ environment:
         secure: yaAnKXWjX6uB9WwCZ4ZQm/R0bCvyribyGYEoTu/kw+F6v8CgJ26n8+u9C6cnuBIN
 
 build_script:
+    # Avoid repo.msys2.org since it's down currently
+    - c:\msys64\usr\bin\bash -lc "sed -e \"/repo.msys2.org/ s/Server/#Server/\" -i /etc/pacman.d/mirrorlist.*"
+    - c:\msys64\usr\bin\bash -lc "cat /etc/pacman.d/mirrorlist.*"
     # Update keyring according to https://www.msys2.org/news/#2020-06-29-new-packagers
     - C:\msys64\usr\bin\curl -O http://mirror.yandex.ru/mirrors/msys2/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz
     - C:\msys64\usr\bin\curl -O http://mirror.yandex.ru/mirrors/msys2/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig
