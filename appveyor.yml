@@ -1,3 +1,5 @@
+image: Visual Studio 2019
+
 init:
   - echo %PATH%
   # We use a clean PATH to avoid interferences with the hundreds of installed programs.
