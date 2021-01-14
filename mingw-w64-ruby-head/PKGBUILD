@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20200824
+pkgver=r20210114
 pkgver() {
   echo r`date +%Y%m%d`
 }
@@ -19,10 +19,10 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-openssl>=1.1.1"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
-source=("https://cache.ruby-lang.org/pub/ruby/snapshot.tar.xz"
+source=("https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-master.tar.xz"
         ruby.ico
         rubyw.ico)
-noextract=("snapshot.tar.xz")
+noextract=("snapshot-master.tar.xz")
 
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 # and set first entry to 'SKIP'
@@ -32,8 +32,8 @@ sha256sums=('SKIP'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
 prepare() {
-  bsdtar -xf snapshot.tar.xz || true
-  cd ${srcdir}/snapshot
+  bsdtar -xf snapshot-master.tar.xz || true
+  cd ${srcdir}/snapshot-master
 
   autoreconf -fi
 }
@@ -49,7 +49,7 @@ build() {
 
   cp ${srcdir}/*.ico .
 
-  ../snapshot/configure \
+  ../snapshot-master/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
@@ -74,7 +74,7 @@ package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
   make -f GNUMakefile DESTDIR="${pkgdir}" install
   for script in {erb,gem,irb,rdoc,ri}; do
-    install ${srcdir}/snapshot/bin/${script} \
+    install ${srcdir}/snapshot-master/bin/${script} \
       ${pkgdir}${MINGW_PREFIX}/bin/
   done
 }
