@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20210114
+pkgver=r20210301
 pkgver() {
   echo r`date +%Y%m%d`
 }
@@ -73,9 +73,8 @@ check() {
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
   make -f GNUMakefile DESTDIR="${pkgdir}" install
-  for script in {erb,gem,irb,rdoc,ri}; do
+  for script in {gem}; do
     install ${srcdir}/snapshot-master/bin/${script} \
       ${pkgdir}${MINGW_PREFIX}/bin/
   done
 }
-
