@@ -73,7 +73,7 @@ check() {
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
   make -f GNUMakefile DESTDIR="${pkgdir}" install
-  for script in {gem}; do
+  for script in gem; do
     install ${srcdir}/snapshot-master/bin/${script} \
       ${pkgdir}${MINGW_PREFIX}/bin/
   done
