@@ -31,7 +31,7 @@ Second option is to clone git repository to your machine and build it for yourse
 Assuming you have a properly installed MSYS2 environment and build tools, you can build any package using the following command:
 ```sh
    cd ${package-name}
-   MINGW_INSTALLS=mingw64 makepkg-mingw -sLf
+   MINGW_ARCH=mingw64 makepkg-mingw -sLf
 ```
 After that you can install the freshly built package(s) with the following command:
 ```sh
