@@ -2,7 +2,7 @@ _realname=ruby
 pkgbase=mingw-w64-ruby26
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby26"
 # version used by MRI
-pkgver2=2.6.6
+pkgver2=2.6.7
 # version used by pacman
 pkgver="${pkgver2/-/.}"
 pkgrel=2
@@ -20,23 +20,17 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
-        0001-win32ole-separate-global-variable-declarations-and-d.patch
         ruby.ico
         rubyw.ico)
 
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
-sha256sums=('5db187882b7ac34016cd48d7032e197f07e4968f406b0690e20193b9b424841f'
-            'ab6784915e81f731aed8498320fe468767be6e5b3fa3586b997d20fb09aa5154'
+sha256sums=('f43ead5626202d5432d2050eeab606e547f0554299cc1e5cf573d45670e59611'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver2}
-
-  patch -p1 -i ${srcdir}/0001-win32ole-separate-global-variable-declarations-and-d.patch
-
-  autoreconf -fi
 }
 
 build() {
