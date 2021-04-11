@@ -24,9 +24,6 @@ environment:
         secure: yaAnKXWjX6uB9WwCZ4ZQm/R0bCvyribyGYEoTu/kw+F6v8CgJ26n8+u9C6cnuBIN
 
 build_script:
-    # Avoid repo.msys2.org since it's down currently
-    - c:\msys64\usr\bin\bash -lc "sed -e \"/repo.msys2.org/ s/Server/#Server/\" -i /etc/pacman.d/mirrorlist.*"
-    - c:\msys64\usr\bin\bash -lc "cat /etc/pacman.d/mirrorlist.*"
     # Update keyring according to https://www.msys2.org/news/#2020-06-29-new-packagers
     - C:\msys64\usr\bin\curl -O http://mirror.yandex.ru/mirrors/msys2/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz
     - C:\msys64\usr\bin\curl -O http://mirror.yandex.ru/mirrors/msys2/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig
@@ -34,13 +31,11 @@ build_script:
     - ridk exec bash -c "pacman -U --noconfirm --config <(echo) msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
     # Remove gcc-ada and gcc-objc, since they are no longer supported by msys2 and therefore cause a dependency issue
     - C:\msys64\usr\bin\pacman --noconfirm --remove mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-objc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-objc
+    # Update MSYS2
     - C:\msys64\usr\bin\pacman --noconfirm --ask 20 --sync --refresh --refresh --sysupgrade --sysupgrade
     # Kill all running msys2 binaries to avoid error "size of shared memory region changed".
     # See https://github.com/msys2/MSYS2-packages/issues/258
     - powershell -Command "Get-Process | Where-Object {$_.path -like 'C:\msys64*'} | Stop-Process"
-    # Avoid repo.msys2.org since it's down currently
-    - c:\msys64\usr\bin\bash -lc "sed -e \"/repo.msys2.org/ s/Server/#Server/\" -i /etc/pacman.d/mirrorlist.*"
-    - c:\msys64\usr\bin\bash -lc "cat /etc/pacman.d/mirrorlist.*"
     - C:\msys64\usr\bin\bash --login -c "$(cygpath ${APPVEYOR_BUILD_FOLDER})/ci-build.sh"
 
 artifacts:
