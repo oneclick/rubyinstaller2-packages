@@ -11,3 +11,41 @@ index 8ea969412f..07c72aea77 100644
              @%:@else
              @%:@define PRINTF_ARGS(decl, string_index, first_to_check) decl
              @%:@endif
+--- a/configure
++++ b/configure
+@@ -13505,7 +13505,7 @@
+            #include <stddef.h>
+             #ifdef __GNUC__
+             #define PRINTF_ARGS(decl, string_index, first_to_check) \
+-              decl __attribute__((format(printf, string_index, first_to_check)))
++              decl __attribute__((format(gnu_printf, string_index, first_to_check)))
+             #else
+             #define PRINTF_ARGS(decl, string_index, first_to_check) decl
+             #endif
+@@ -13588,7 +13588,7 @@
+            #include <stddef.h>
+             #ifdef __GNUC__
+             #define PRINTF_ARGS(decl, string_index, first_to_check) \
+-              decl __attribute__((format(printf, string_index, first_to_check)))
++              decl __attribute__((format(gnu_printf, string_index, first_to_check)))
+             #else
+             #define PRINTF_ARGS(decl, string_index, first_to_check) decl
+             #endif
+@@ -17294,7 +17294,7 @@
+            #include <stddef.h>
+             #ifdef __GNUC__
+             #define PRINTF_ARGS(decl, string_index, first_to_check) \
+-              decl __attribute__((format(printf, string_index, first_to_check)))
++              decl __attribute__((format(gnu_printf, string_index, first_to_check)))
+             #else
+             #define PRINTF_ARGS(decl, string_index, first_to_check) decl
+             #endif
+@@ -17374,7 +17374,7 @@
+            #include <stddef.h>
+             #ifdef __GNUC__
+             #define PRINTF_ARGS(decl, string_index, first_to_check) \
+-              decl __attribute__((format(printf, string_index, first_to_check)))
++              decl __attribute__((format(gnu_printf, string_index, first_to_check)))
+             #else
+             #define PRINTF_ARGS(decl, string_index, first_to_check) decl
+             #endif
