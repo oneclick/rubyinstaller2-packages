@@ -1,13 +1,14 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20210301
+pkgver=r20210502
 pkgver() {
   echo r`date +%Y%m%d`
 }
 pkgrel=1
 pkgdesc="An object-oriented language for quick and easy programming (mingw-w64)"
 arch=('any')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64')
 url="https://www.ruby-lang.org/en"
 license=("BSD, custom")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-pkg-config")
@@ -20,6 +21,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-master.tar.xz"
+        0001-ucrt-v2.patch
         ruby.ico
         rubyw.ico)
 noextract=("snapshot-master.tar.xz")
@@ -28,12 +30,14 @@ noextract=("snapshot-master.tar.xz")
 # and set first entry to 'SKIP'
 
 sha256sums=('SKIP'
+            '654c4db8cd554db34616148cf92fd9e60c429d68925b22aa1ec0ab0e1d58722b'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
 prepare() {
   bsdtar -xf snapshot-master.tar.xz || true
   cd ${srcdir}/snapshot-master
+  patch -p1 -i ${srcdir}/0001-ucrt-v2.patch
 
   autoreconf -fi
 }
