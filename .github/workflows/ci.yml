@@ -1,0 +1,65 @@
+name: CI
+on:
+  push:
+  pull_request:
+  schedule:
+  - cron:  '30 1 * * *'
+
+jobs:
+  build-package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - MINGW_ARCH: "mingw32"
+        - MINGW_ARCH: "mingw64"
+        - MINGW_ARCH: "ucrt64"
+
+    runs-on: windows-latest
+    env:
+      MINGW_ARCH: ${{ matrix.MINGW_ARCH }}
+
+    steps:
+    - name: configure git crlf
+      run: |
+        git config --system core.autocrlf false
+        git config --system core.eol lf
+
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.0"
+
+    - run: bundle install
+
+    - name: Update MSYS2
+      shell: powershell
+      # See https://github.com/msys2/MSYS2-packages/issues/258
+      run: |
+        C:\msys64\usr\bin\pacman --noconfirm --ask 20 --sync --refresh --refresh --sysupgrade --sysupgrade
+        Get-Process | Where-Object {$_.path -like 'C:\msys64*'} | Stop-Process
+        C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
+
+    - name: Build packages
+      shell: cmd
+      env:
+        GPGPASSWD: ${{ secrets.GPGPASSWD }}
+      run: C:\msys64\usr\bin\bash --login -c "$(cygpath ${GITHUB_WORKSPACE})/ci-build.sh"
+
+    - name: Download package database
+      shell: cmd
+      env:
+        GPGPASSWD: ${{ secrets.GPGPASSWD }}
+      run: |
+        ridk exec bash -c "source 'ci-library.sh'; deploy_enabled && cd artifacts && create_pacman_repository 'ci.ri2'"
+
+    - name: Upload packages
+      shell: cmd
+      env:
+        DEPLOY_REPO_NAME: oneclick/rubyinstaller2-packages
+        DEPLOY_TAG: ci.ri2
+        DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+      run: rake upload -- artifacts/*.pkg.tar.zst artifacts/*.pkg.tar.zst.sig artifacts/*.db.tar.zst artifacts/*.db.tar.zst.sig artifacts/*.db artifacts/*.db.sig artifacts/*.files.tar.zst artifacts/*.files.tar.zst.sig artifacts/*.files artifacts/*.files.sig

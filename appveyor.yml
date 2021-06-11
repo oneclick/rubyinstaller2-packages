@@ -12,10 +12,6 @@ init:
   - c:\windows\syswow64\cmd.exe /c "del c:\windows\system32\libcrypto-1_1.dll c:\windows\system32\libssl-1_1.dll"
 
 environment:
-    DEPLOY_PROVIDER: bintray
-    BINTRAY_ACCOUNT: larskanis
-    BINTRAY_REPOSITORY: rubyinstaller2-packages
-    BINTRAY_VERSION: latest
     PACMAN_REPOSITORY_NAME: ci.ri2
     BUILD_URL: https://ci.appveyor.com/project/$(APPVEYOR_ACCOUNT_NAME)/$(APPVEYOR_PROJECT_NAME)/build/$(APPVEYOR_BUILD_VERSION)
     GPGPASSWD:
@@ -38,16 +34,5 @@ build_script:
     - powershell -Command "Get-Process | Where-Object {$_.path -like 'C:\msys64*'} | Stop-Process"
     - C:\msys64\usr\bin\bash --login -c "$(cygpath ${APPVEYOR_BUILD_FOLDER})/ci-build.sh"
 
-artifacts:
-    - path: artifacts\*
-
-deploy:
-    - provider: BinTray
-      username: $(BINTRAY_ACCOUNT)
-      subject: $(BINTRAY_ACCOUNT)
-      repo: $(BINTRAY_REPOSITORY)
-      package: $(PACMAN_REPOSITORY_NAME)
-      version: latest
-      publish: true
-      override: true
-      api_key: $(BINTRAY_API_KEY)
+    # Upload packages and pacman database to repository release files
+    - rake upload -- artifacts\*

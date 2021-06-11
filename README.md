@@ -16,9 +16,10 @@ Packages from this repository can be downloaded here: https://dl.bintray.com/lar
 It is also possible to add the RubyInstaller repository as a pacman repository in your MSYS2 installation.
 Execute this within a MSYS2 shell to download and trust the public signatur key and to add the new package source:
 ```sh
+pacman --noconfirm --sync --needed pactoys
 pacman-key --recv-keys BE8BF1C5
 pacman-key --lsign-key BE8BF1C5
-repman add ci.ri2 "http://dl.bintray.com/larskanis/rubyinstaller2-packages"
+repman add ci.ri2 "https://github.com/oneclick/rubyinstaller2-packages/releases/download/ci.ri2"
 ```
 
 You can then install or update MSYS2-MINGW ruby like so:

@@ -94,9 +94,8 @@ _build_add() {
 # Download previous artifact
 _download_previous() {
     local filenames=("${@}")
-    [[ "${DEPLOY_PROVIDER}" = bintray ]] || return 1
     for filename in "${filenames[@]}"; do
-        if ! wget --no-verbose "https://dl.bintray.com/${BINTRAY_ACCOUNT}/${BINTRAY_REPOSITORY}/${filename}"; then
+        if ! wget --no-verbose "https://github.com/oneclick/rubyinstaller2-packages/releases/download/ci.ri2/${filename}"; then
             rm -f "${filenames[@]}"
             return 1
         fi
@@ -125,14 +124,6 @@ execute(){
         else ${command%%:*} | ${command#*:} ${arguments[@]}
     fi || failure "${status} failed"
     cd - > /dev/null
-}
-
-# Update system
-update_system() {
-    repman add ci.msys 'https://dl.bintray.com/alexpux/msys2' || return 1
-    pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade || return 1
-    test -n "${DISABLE_QUALITY_CHECK}" && return 0 # TODO: remove this option when not anymore needed
-    pacman --noconfirm --needed --sync ci.msys/pactoys
 }
 
 # Sort packages by dependency
@@ -191,8 +182,6 @@ drop_old_bintray_versions() {
 
 # Deployment is enabled
 deploy_enabled() {
-    test -n "${BUILD_URL}" || return 1
-    [[ "${DEPLOY_PROVIDER}" = bintray ]] || return 1
     [[ -n "${GPGPASSWD}" ]]
 }
 
@@ -222,24 +211,14 @@ check_recipe_quality() {
     saneman --format='\t%l:%c %p:%c %m' --verbose --no-terminal "${packages[@]}"
 }
 
-# Add ci.ri2 repository
+# Add ci.ri2 repository to /etc/pacman.conf
 add_ci_ri2_repo() {
     # Trust public signature key
     gpg --export BE8BF1C5 | pacman-key --add -
     pacman-key --lsign-key BE8BF1C5
 
-    if grep -Fxq "[ci.ri2]" /etc/pacman.conf
-    then
-        echo "[ci.ri2] already in /etc/pacman.conf"
-    else
-        echo "add [ci.ri2] to /etc/pacman.conf"
-        cat >>/etc/pacman.conf <<-EOT
-
-# Added by appveyor build script
-[ci.ri2]
-Server = http://dl.bintray.com/larskanis/rubyinstaller2-packages
-EOT
-    fi
+    pacman --noconfirm --sync --needed pactoys
+    repman add ci.ri2 'https://github.com/oneclick/rubyinstaller2-packages/releases/download/ci.ri2'
 
     # Download [ci.ri2] package list
     pacman --noconfirm --sync --refresh
