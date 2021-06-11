@@ -1,17 +1,28 @@
+require "tmpdir"
+
 CONTENT_TYPE_FOR_EXT = {
   ".sig" => "application/pgp-signature",
   ".db" => "application/zstd",
   ".files" => "application/zstd",
   ".zst" => "application/zstd",
+  ".txt" => "text/plain",
 }
 
-def upload_to_github(tag:, repo:, token: nil, files:)
+def repo_release
   require "octokit"
 
+  tag = ENV['DEPLOY_TAG']
+  repo = ENV['DEPLOY_REPO_NAME']
+  token = ENV['DEPLOY_TOKEN']
   client = Octokit::Client.new(access_token: token)
-  release = client.releases(repo).find{|r| r.tag_name==tag }
-  $stderr.puts "Add #{files.size} files to github release #{tag}"
+  rel = client.releases(repo).find{|r| r.tag_name==tag }
+  [client, rel]
+end
 
+def upload_to_github(files:)
+  $stderr.puts "Add #{files.size} files to github release"
+
+  client, release = repo_release
   old_assets = release.assets
 
   files.each do |fname|
@@ -26,14 +37,59 @@ def upload_to_github(tag:, repo:, token: nil, files:)
   end
 end
 
+namespace "upload" do
+  desc "aquire lock for upload"
+  task "lock" do
+    Dir.mktmpdir do |tmpdir|
+      my_lockid = ENV['GITHUB_RUN_ID']
+      fname = File.join(tmpdir, "lock.txt")
+      File.write(fname, my_lockid)
+
+      loop do
+        client, release = repo_release
+        if asset=release.assets.find{|a| a.name == File.basename(fname) }
+          # already locked
+          their_lockid = client.get(asset.browser_download_url)
+          break if their_lockid == my_lockid
+          $stderr.print "Wait for lock"
+          sleep rand(10)
+        else
+          # try to lock
+          begin
+            $stderr.print "Uploading #{fname} (#{File.size(fname)} bytes) ... "
+            client.upload_asset(release.url, fname, content_type: CONTENT_TYPE_FOR_EXT[File.extname(fname)])
+          rescue Faraday::ConnectionFailed, Octokit::UnprocessableEntity
+          rescue Octokit::ClientError
+            # Wait longer due to abuse detection
+            sleep 75
+          end
+        end
+      end
+    end
+  end
+
+  desc "release lock for upload"
+  task "unlock" do
+    client, release = repo_release
+    assets = release.assets
+    my_lockid = ENV['GITHUB_RUN_ID']
+    fname = "lock.txt"
+
+    if asset=assets.find{|a| a.name == File.basename(fname) }
+      their_lockid = client.get(asset.browser_download_url)
+      if their_lockid != my_lockid
+        raise "unlocking a foreign lock"
+      end
+
+      $stderr.puts "Delete lock file #{asset.name}"
+      client.delete_release_asset(asset.url)
+    end
+  end
+end
+
 desc "upload files to github release"
 task "upload" do
   files = ARGV[ARGV.index("--")+1 .. -1]
 
-  upload_to_github(
-    tag: ENV['DEPLOY_TAG'],
-    repo: ENV['DEPLOY_REPO_NAME'],
-    token: ENV['DEPLOY_TOKEN'],
-    files: files
-  )
+  upload_to_github(files: files)
 end

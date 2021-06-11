@@ -34,5 +34,8 @@ build_script:
     - powershell -Command "Get-Process | Where-Object {$_.path -like 'C:\msys64*'} | Stop-Process"
     - C:\msys64\usr\bin\bash --login -c "$(cygpath ${APPVEYOR_BUILD_FOLDER})/ci-build.sh"
 
-    # Upload packages and pacman database to repository release files
-    - rake upload -- artifacts\*
+    #- rake upload:lock
+    #- ridk exec bash -c "source 'ci-library.sh'; deploy_enabled && cd artifacts && create_pacman_repository 'ci.ri2'"
+    ## Upload packages and pacman database to repository release files
+    #- rake upload -- artifacts\*
+    #- rake upload:unlock
