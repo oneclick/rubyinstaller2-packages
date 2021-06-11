@@ -151,8 +151,8 @@ create_build_references() {
 # Add packages to repository
 create_pacman_repository() {
     local name="${1}"
-    _download_previous "${name}".{db,files}{,.tar.xz}{,.sig}
-    repo-add --sign --verify "${name}.db.tar.xz" *.pkg.tar.zst
+    _download_previous "${name}".{db,files}{,.tar.zst}{,.sig}
+    repo-add --sign --verify "${name}.db.tar.zst" *.pkg.tar.zst
 }
 
 _drop_bintray_files() {
