@@ -12,7 +12,7 @@ def upload_to_github(tag:, repo:, token: nil, files:)
   release = client.releases(repo).find{|r| r.tag_name==tag }
   $stderr.puts "Add #{files.size} files to github release #{tag}"
 
-  old_assets = client.release_assets(release.url)
+  old_assets = release.assets
 
   files.each do |fname|
     if old_asset=old_assets.find{|a| a.name == File.basename(fname) }
