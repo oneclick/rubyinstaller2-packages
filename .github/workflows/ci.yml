@@ -49,6 +49,10 @@ jobs:
         GPGPASSWD: ${{ secrets.GPGPASSWD }}
       run: C:\msys64\usr\bin\bash --login -c "$(cygpath ${GITHUB_WORKSPACE})/ci-build.sh"
 
+    - name: Create lock ID
+      shell: cmd
+      run: ruby -e 'puts "DEPLOY_LOCK=#{rand}"' >>%GITHUB_ENV%
+
     - name: Lock package repository
       shell: cmd
       env:

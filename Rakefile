@@ -41,7 +41,7 @@ namespace "upload" do
   desc "aquire lock for upload"
   task "lock" do
     Dir.mktmpdir do |tmpdir|
-      my_lockid = ENV['GITHUB_RUN_ID']
+      my_lockid = ENV['DEPLOY_LOCK']
       fname = File.join(tmpdir, "lock.txt")
       File.write(fname, my_lockid)
 
@@ -72,7 +72,7 @@ namespace "upload" do
   task "unlock" do
     client, release = repo_release
     assets = release.assets
-    my_lockid = ENV['GITHUB_RUN_ID']
+    my_lockid = ENV['DEPLOY_LOCK']
     fname = "lock.txt"
 
     if asset=assets.find{|a| a.name == File.basename(fname) }
