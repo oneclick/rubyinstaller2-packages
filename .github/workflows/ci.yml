@@ -18,6 +18,7 @@ jobs:
     runs-on: windows-latest
     env:
       MINGW_ARCH: ${{ matrix.MINGW_ARCH }}
+      APPVEYOR_SCHEDULED_BUILD: ${{ github.event.schedule }}
 
     steps:
     - name: configure git crlf
