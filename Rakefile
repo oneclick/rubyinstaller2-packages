@@ -89,7 +89,10 @@ end
 
 desc "upload files to github release"
 task "upload" do
-  files = ARGV[ARGV.index("--")+1 .. -1]
+  files = ARGV[ARGV.index("--")+1 .. -1].reject do |f|
+    # Remove unexpanded wildcards and add dummy task to satisfy rake
+    !File.exist?(f) && f =~ /[\*\?]/ && task(f)
+  end
 
   upload_to_github(files: files)
 end
