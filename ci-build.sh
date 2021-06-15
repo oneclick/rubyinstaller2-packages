@@ -13,8 +13,11 @@ git_config user.name  'RubyInstaller2 Continuous Integration'
 git remote add upstream 'https://github.com/oneclick/rubyinstaller2-packages'
 git fetch --quiet upstream
 
+# Decrypt and import private sigature key
+deploy_enabled && (gpg --batch --passphrase "${GPGPASSWD}" --decrypt appveyor-key.asc.asc | gpg --import)
+
 # Detect
-if [ -z $APPVEYOR_SCHEDULED_BUILD ]
+if [ -z "${APPVEYOR_SCHEDULED_BUILD}" ]
 then
     list_commits  || failure 'Could not detect added commits'
     list_packages || failure 'Could not detect changed files'
@@ -27,8 +30,6 @@ fi
 define_build_order || failure 'Could not determine build order'
 message 'Building packages' "${packages[@]}"
 
-# Decrypt and import private sigature key
-deploy_enabled && (gpg --batch --passphrase $GPGPASSWD --decrypt appveyor-key.asc.asc | gpg --import)
 execute 'Add [ci.ri2] respository to pacman.conf' add_ci_ri2_repo
 
 # Build
@@ -47,5 +48,4 @@ for package in "${packages[@]}"; do
     unset package
 done
 
-# Deploy
 success 'All packages built successfully'
