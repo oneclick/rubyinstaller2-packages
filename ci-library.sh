@@ -152,7 +152,12 @@ create_build_references() {
 create_pacman_repository() {
     local name="${1}"
     _download_previous "${name}".{db,files}{,.tar.zst}{,.sig}
-    repo-add --sign --verify "${name}.db.tar.zst" *.pkg.tar.zst
+    
+    # Add files to repository if any
+    files=(*.pkg.tar.zst)
+    if [ -e "${files[0]}" ]; then
+      repo-add --sign --verify "${name}.db.tar.zst" *.pkg.tar.zst
+    fi
 }
 
 _drop_bintray_files() {
