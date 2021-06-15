@@ -1,0 +1,20 @@
+--- a/win32/win32.c
++++ b/win32/win32.c
+@@ -2578,7 +2578,7 @@
+     char *pend = p;
+     /* _osfile(fh) & FDEV */
+ 
+-# if _WIN64
++# ifdef _WIN64
+     int32_t rel;
+     char *rip;
+     /* add rsp, _ */
+@@ -2620,7 +2620,7 @@
+ 
+     found:
+     p += sizeof(PIOINFO_MARK) - 1;
+-#if _WIN64
++#ifdef _WIN64
+     rel = *(int32_t*)(p);
+     rip = p + sizeof(int32_t);
+     __pioinfo = (ioinfo**)(rip + rel);

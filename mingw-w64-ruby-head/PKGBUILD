@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20210610
+pkgver=r20210615
 pkgver() {
   echo r`date +%Y%m%d`
 }
@@ -20,7 +20,11 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-master.tar.xz"
-        0001-ucrt-v2.patch
+        ruby-configure-coroutine-mingw32.patch
+        ruby-configure-mingw32-ucrt.patch
+        ruby-date-mingw32-ucrt-timezone.patch
+        ruby-i386-mingw32-ucrt-undef.patch
+        ruby-mingw32-ucrt.patch
         0002-Don-t-add-an-exe-file-manifest.patch
         ruby.ico
         rubyw.ico)
@@ -30,7 +34,11 @@ noextract=("snapshot-master.tar.xz")
 # and set first entry to 'SKIP'
 
 sha256sums=('SKIP'
-            '654c4db8cd554db34616148cf92fd9e60c429d68925b22aa1ec0ab0e1d58722b'
+            'ed04463388069393f2ee3b759e87f366cae7a6b2c3fd8adfcaf53fb1f245d3f1'
+            'e82a008ae0ddade1e020fd7632c752eee31e3debd747cda4e3e8c4a4621390bf'
+            '483025e7742387aa353fe223f85d84f84099d12979bb99aadabc57fe6eae84d6'
+            '0d535322829a7e52be5ca62c04f4e21467af121342545b6a9007250a582f1e48'
+            '4a97c2513ad74b626884c75cc31555c9a49548b7c775ecd225e7e921059dfd05'
             'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
@@ -38,9 +46,12 @@ sha256sums=('SKIP'
 prepare() {
   bsdtar -xf snapshot-master.tar.xz || true
   cd ${srcdir}/snapshot-master
-  patch -p1 -i ${srcdir}/0001-ucrt-v2.patch
+  patch -p1 -i ${srcdir}/ruby-configure-coroutine-mingw32.patch
+  patch -p1 -i ${srcdir}/ruby-configure-mingw32-ucrt.patch
+  patch -p1 -i ${srcdir}/ruby-date-mingw32-ucrt-timezone.patch
+  patch -p1 -i ${srcdir}/ruby-i386-mingw32-ucrt-undef.patch
+  patch -p1 -i ${srcdir}/ruby-mingw32-ucrt.patch
   patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
-
   autoreconf -fi
 }
 
