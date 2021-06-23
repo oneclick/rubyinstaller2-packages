@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20210615
+pkgver=r20210613
 pkgver() {
   echo r`date +%Y%m%d`
 }
@@ -25,6 +25,7 @@ source=("https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-master.tar.xz"
         ruby-date-mingw32-ucrt-timezone.patch
         ruby-i386-mingw32-ucrt-undef.patch
         ruby-mingw32-ucrt.patch
+        platform-mingw-ucrt.patch
         0002-Don-t-add-an-exe-file-manifest.patch
         ruby.ico
         rubyw.ico)
@@ -39,6 +40,7 @@ sha256sums=('SKIP'
             '483025e7742387aa353fe223f85d84f84099d12979bb99aadabc57fe6eae84d6'
             '0d535322829a7e52be5ca62c04f4e21467af121342545b6a9007250a582f1e48'
             '4a97c2513ad74b626884c75cc31555c9a49548b7c775ecd225e7e921059dfd05'
+            'b0a8b653bbf770dd43dde6fc29ce099f6e6560547f4f1b1b2e43a7436925dcca'
             'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
@@ -51,6 +53,7 @@ prepare() {
   patch -p1 -i ${srcdir}/ruby-date-mingw32-ucrt-timezone.patch
   patch -p1 -i ${srcdir}/ruby-i386-mingw32-ucrt-undef.patch
   patch -p1 -i ${srcdir}/ruby-mingw32-ucrt.patch
+  patch -p1 -i ${srcdir}/platform-mingw-ucrt.patch
   patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
   autoreconf -fi
 }
