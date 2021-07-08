@@ -49,7 +49,11 @@ namespace "upload" do
         client, release = repo_release
         if asset=release.assets.find{|a| a.name == File.basename(fname) }
           # already locked
-          their_lockid = client.get(asset.browser_download_url)
+          begin
+            their_lockid = client.get(asset.browser_download_url)
+          rescue Octokit::NotFound
+            # lock file was removed between listing and reading
+          end
           break if their_lockid == my_lockid
           $stderr.print "Wait for lock"
           sleep rand(10)
