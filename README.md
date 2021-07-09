@@ -11,7 +11,7 @@ In addition the latest ruby-2.5 snapshot is build and uploaded on a daily base.
 
 ## Install packages
 
-Packages from this repository can be downloaded here: https://dl.bintray.com/larskanis/rubyinstaller2-packages/
+Packages from this repository can be downloaded here: https://github.com/oneclick/rubyinstaller2-packages/releases/tag/ci.ri2
 
 It is also possible to add the RubyInstaller repository as a pacman repository in your MSYS2 installation.
 Execute this within a MSYS2 shell to download and trust the public signatur key and to add the new package source:
