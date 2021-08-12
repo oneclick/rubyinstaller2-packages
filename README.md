@@ -1,13 +1,14 @@
 # MSYS2-MINGW packages for RubyInstaller2
 
-[![Build status](https://ci.appveyor.com/api/projects/status/a27uf6omaj2okbyc/branch/master?svg=true)](https://ci.appveyor.com/project/larskanis/rubyinstaller2-packages/branch/master)
+[![CI build status](https://github.com/oneclick/rubyinstaller2-packages/actions/workflows/ci.yml/badge.svg)](https://github.com/oneclick/rubyinstaller2-packages/actions/workflows/ci.yml)
 
 This repository contains package scripts for MinGW-w64 targets to build under MSYS2.
 The main intension of this repository is to provide binary ruby packages for [RubyInstaller2](https://github.com/oneclick/rubyinstaller2) in several versions.
 
-Packages are built on Appveyor when the corresponding directory has changed in the last commit.
-They are subsequently signed and uploaded to a bintray repository.
-In addition the latest ruby-2.5 snapshot is build and uploaded on a daily base.
+Packages are built on Github Actions when the corresponding directory has changed in the last commit.
+They are subsequently signed and uploaded to this [github release](https://github.com/oneclick/rubyinstaller2-packages/releases/tag/ci.ri2).
+In addition the latest ruby-head snapshot is build and uploaded on a daily base.
+The github release also contains pacman database files and is usable as a pacman repository.
 
 ## Install packages
 
