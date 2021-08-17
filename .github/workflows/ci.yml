@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
   schedule:
-  - cron:  '30 1 * * *'
+  - cron:  '30 19 * * *'
 
 jobs:
   build-package:
