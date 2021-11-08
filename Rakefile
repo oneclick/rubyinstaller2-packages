@@ -49,11 +49,7 @@ namespace "upload" do
         client, release = repo_release
         if asset=release.assets.find{|a| a.name == File.basename(fname) }
           # already locked
-          begin
-            their_lockid = client.get(asset.browser_download_url)
-          rescue Octokit::NotFound
-            # lock file was removed between listing and reading
-          end
+          their_lockid = asset.label
           break if their_lockid == my_lockid
           $stderr.print "Wait for lock"
           sleep rand(10)
@@ -61,7 +57,9 @@ namespace "upload" do
           # try to lock
           begin
             $stderr.print "Uploading #{fname} (#{File.size(fname)} bytes) ... "
-            client.upload_asset(release.url, fname, content_type: CONTENT_TYPE_FOR_EXT[File.extname(fname)])
+            client.upload_asset(release.url, fname,
+                                content_type: CONTENT_TYPE_FOR_EXT[File.extname(fname)],
+                                label: my_lockid)
           rescue Faraday::ConnectionFailed, Octokit::UnprocessableEntity
           rescue Octokit::ClientError
             # Wait longer due to abuse detection
@@ -80,7 +78,7 @@ namespace "upload" do
     fname = "lock.txt"
 
     if asset=assets.find{|a| a.name == File.basename(fname) }
-      their_lockid = client.get(asset.browser_download_url)
+      their_lockid = asset.label
       if their_lockid != my_lockid
         raise "unlocking a foreign lock"
       end
