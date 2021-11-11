@@ -151,7 +151,15 @@ create_build_references() {
 # Add packages to repository
 create_pacman_repository() {
     local name="${1}"
-    _download_previous "${name}".{db,files}{,.tar.zst}{,.sig}
+    local max_retry=20
+    local counter=0
+    until _download_previous "${name}".{db,files}{,.tar.zst}{,.sig}
+    do
+        sleep 10
+        [[ counter -eq $max_retry ]] && echo "Download failed!" && exit 1
+        echo "Trying again. Try #$counter"
+        ((counter++))
+    done
     
     # Add files to repository if any
     files=(*.pkg.tar.zst)
