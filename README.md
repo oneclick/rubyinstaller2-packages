@@ -35,6 +35,15 @@ Assuming you have a properly installed MSYS2 environment and build tools, you ca
    cd ${package-name}
    MINGW_ARCH=mingw64 makepkg-mingw -sLf
 ```
+
+Or in a CMD shell:
+```sh
+   cd ${package-name}
+   ridk enable
+   set MINGW_ARCH=mingw64
+   sh -c "makepkg-mingw -sLf"
+```
+
 After that you can install the freshly built package(s) with the following command:
 ```sh
    pacman -U ${package-name}*.pkg.tar.zst
