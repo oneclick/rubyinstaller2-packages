@@ -20,6 +20,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
+        0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
         0002-Don-t-add-an-exe-file-manifest.patch
         ruby.ico
         rubyw.ico)
@@ -27,12 +28,14 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
 sha256sums=('1a0e0b69b9b062b6299ff1f6c6d77b66aff3995f63d1d8b8771e7a113ec472e2'
+            'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
             'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver2}
+  patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
   patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
 }
 
