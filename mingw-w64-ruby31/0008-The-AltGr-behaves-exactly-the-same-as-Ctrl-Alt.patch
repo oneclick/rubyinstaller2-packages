@@ -1,0 +1,26 @@
+From 75fe9759a4b9a5f6e47abcc63cf195163502d2e6 Mon Sep 17 00:00:00 2001
+From: aycabta <aycabta@gmail.com>
+Date: Tue, 18 Jan 2022 06:10:06 +0900
+Subject: [PATCH 08/10] The AltGr behaves exactly the same as Ctrl+Alt
+
+On European keyboards.
+---
+ lib/reline/windows.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/reline/windows.rb b/lib/reline/windows.rb
+index f064472..005c6c3 100644
+--- a/lib/reline/windows.rb
++++ b/lib/reline/windows.rb
+@@ -249,7 +249,7 @@ class Reline::Windows
+     # no char, only control keys
+     return if key.char_code == 0 and key.control_keys.any?
+ 
+-    @@output_buf.push("\e".ord) if key.control_keys.include?(:ALT)
++    @@output_buf.push("\e".ord) if key.control_keys.include?(:ALT) and !key.control_keys.include?(:CTRL)
+ 
+     @@output_buf.concat(key.char.bytes)
+   end
+-- 
+2.30.0.windows.1
+

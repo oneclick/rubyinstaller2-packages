@@ -22,6 +22,7 @@ options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
         0002-Don-t-add-an-exe-file-manifest.patch
+        0008-The-AltGr-behaves-exactly-the-same-as-Ctrl-Alt.patch
         ruby.ico
         rubyw.ico)
 
@@ -30,6 +31,7 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
 sha256sums=('7aefaa6b78b076515d272ec59c4616707a54fc9f2391239737d5f10af7a16caa'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
             'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
+            '1bc411c524ce724d444abb380dba612ba3b78cf7da5398d90b7cffc3fdaa07fe'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
@@ -37,6 +39,7 @@ prepare() {
   cd ${srcdir}/${_realname}-${pkgver2}
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
   patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
+  patch -p1 -i ${srcdir}/0008-The-AltGr-behaves-exactly-the-same-as-Ctrl-Alt.patch
 }
 
 build() {
