@@ -87,6 +87,21 @@ namespace "upload" do
       client.delete_release_asset(asset.url)
     end
   end
+
+  desc "remove outdated github releases"
+  task "remove_old" do
+    $stderr.puts "Remove outdated package files from github release"
+
+    client, release = repo_release
+    old_assets = release.assets
+
+    old_assets.map do |a|
+      a.name =~ /ruby-head-r(\d{8})-/ && [a, $1]
+    end.compact.sort_by(&:last)[0..-19].each do |a, _date|
+      $stderr.puts "Delete old #{a.name}"
+      client.delete_release_asset(a.url)
+    end
+  end
 end
 
 desc "upload files to github release"

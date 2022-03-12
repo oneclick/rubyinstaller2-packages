@@ -19,6 +19,9 @@ jobs:
     env:
       MINGW_ARCH: ${{ matrix.MINGW_ARCH }}
       APPVEYOR_SCHEDULED_BUILD: ${{ github.event.schedule }}
+      DEPLOY_REPO_NAME: oneclick/rubyinstaller2-packages
+      DEPLOY_TAG: ci.ri2
+      DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
 
     steps:
     - name: configure git crlf
@@ -56,10 +59,6 @@ jobs:
 
     - name: Lock package repository
       shell: cmd
-      env:
-        DEPLOY_REPO_NAME: oneclick/rubyinstaller2-packages
-        DEPLOY_TAG: ci.ri2
-        DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
       run: rake upload:lock
 
     - name: Download package database
@@ -71,17 +70,13 @@ jobs:
 
     - name: Upload packages
       shell: cmd
-      env:
-        DEPLOY_REPO_NAME: oneclick/rubyinstaller2-packages
-        DEPLOY_TAG: ci.ri2
-        DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
       run: rake upload -- artifacts/*.pkg.tar.zst artifacts/*.pkg.tar.zst.sig artifacts/*.db.tar.zst artifacts/*.db.tar.zst.sig artifacts/*.db artifacts/*.db.sig artifacts/*.files.tar.zst artifacts/*.files.tar.zst.sig artifacts/*.files artifacts/*.files.sig
+
+    - name: Remove outdated packages from github releases
+      shell: cmd
+      run: rake upload:remove_old
 
     - name: Unlock package repository
       shell: cmd
       if: ${{ always() }}
-      env:
-        DEPLOY_REPO_NAME: oneclick/rubyinstaller2-packages
-        DEPLOY_TAG: ci.ri2
-        DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
       run: rake upload:unlock
