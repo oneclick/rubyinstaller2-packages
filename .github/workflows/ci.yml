@@ -47,6 +47,12 @@ jobs:
         Get-Process | Where-Object {$_.path -like 'C:\msys64*'} | Stop-Process
         C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
 
+    - name: Print version info
+      shell: cmd
+      run: |
+        ruby -v
+        ridk exec gcc -v
+
     - name: Build packages
       shell: cmd
       env:

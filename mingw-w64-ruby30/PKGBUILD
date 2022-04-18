@@ -55,7 +55,7 @@ build() {
     --target=${MINGW_CHOST} \
     --with-out-ext=readline,pty,syslog
 
-  make showflags main
+  make showflags main V=1
   echo "Generate RI and HTML documentation"
   # Make rdoc outputs so many lines -> print dots only
   make rdoc html 2>&1 | ./miniruby -ne "STDERR.print '.'"
