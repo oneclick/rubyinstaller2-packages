@@ -37,6 +37,11 @@ jobs:
       with:
         ruby-version: "3.0"
 
+    - name: Remove troublesome packages
+      shell: powershell
+      run: |
+        C:\msys64\usr\bin\pacman --noconfirm --remove ${Env:MINGW_PACKAGE_PREFIX}-dlfcn --cascade
+
     - run: bundle install
 
     - name: Update MSYS2
