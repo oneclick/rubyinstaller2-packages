@@ -39,19 +39,23 @@ jobs:
 
     - run: bundle install
 
-    - name: Update MSYS2
-      shell: powershell
-      # See https://github.com/msys2/MSYS2-packages/issues/258
-      run: |
-        C:\msys64\usr\bin\pacman --noconfirm --ask 20 --sync --refresh --refresh --sysupgrade --sysupgrade
-        Get-Process | Where-Object {$_.path -like 'C:\msys64*'} | Stop-Process
-        C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
+    #- name: Update MSYS2
+      #shell: powershell
+      ## See https://github.com/msys2/MSYS2-packages/issues/258
+      #run: |
+        #C:\msys64\usr\bin\pacman --noconfirm --ask 20 --sync --refresh --refresh --sysupgrade --sysupgrade
+        #Get-Process | Where-Object {$_.path -like 'C:\msys64*'} | Stop-Process
+        #C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
 
     - name: Print version info
       shell: cmd
       run: |
         ruby -v
         ridk exec gcc -v
+
+    - name: workaround signature issue on github actions
+      shell: cmd
+      run: C:\msys64\usr\bin\sed -i "/^SigLevel/ s/$/ DatabaseOptional/" /etc/pacman.conf
 
     - name: Build packages
       shell: cmd
