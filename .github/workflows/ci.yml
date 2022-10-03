@@ -74,6 +74,20 @@ jobs:
       run: |
         ridk exec bash -c "source 'ci-library.sh'; deploy_enabled && cd artifacts && create_pacman_repository 'ci.ri2'"
 
+    - name: Backup pacman database as artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: pacman-database
+        path: |
+          artifacts/*.db.tar.zst
+          artifacts/*.db.tar.zst.sig
+          artifacts/*.db
+          artifacts/*.db.sig
+          artifacts/*.files.tar.zst
+          artifacts/*.files.tar.zst.sig
+          artifacts/*.files
+          artifacts/*.files.sig
+
     - name: Upload packages
       shell: cmd
       run: rake upload -- artifacts/*.pkg.tar.zst artifacts/*.pkg.tar.zst.sig artifacts/*.db.tar.zst artifacts/*.db.tar.zst.sig artifacts/*.db artifacts/*.db.sig artifacts/*.files.tar.zst artifacts/*.files.tar.zst.sig artifacts/*.files artifacts/*.files.sig
