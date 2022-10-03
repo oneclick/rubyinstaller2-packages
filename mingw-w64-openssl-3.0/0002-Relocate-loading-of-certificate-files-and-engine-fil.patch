@@ -1,0 +1,150 @@
+From 94cc25484dfff7e4163df974ab7c763844a1249b Mon Sep 17 00:00:00 2001
+From: Lars Kanis <lars@greiz-reinsdorf.de>
+Date: Mon, 3 Oct 2022 14:34:17 +0200
+Subject: [PATCH 2/2] Relocate loading of certificate files and engine files
+ relative to the running exe binary
+
+Taken from
+  https://github.com/msys2/MINGW-packages/blob/master/mingw-w64-openssl/openssl-1.1.1-relocation.patch
+
+The two files pathtools.c and .h are stored outside of the patch file for better maintanence.
+---
+ crypto/build.info        |  2 +-
+ crypto/engine/eng_list.c | 25 +++++++++++++++++++++++--
+ crypto/x509/x509_def.c   | 40 ++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 60 insertions(+), 7 deletions(-)
+
+diff --git a/crypto/build.info b/crypto/build.info
+index c04db55911..de15b120b8 100644
+--- a/crypto/build.info
++++ b/crypto/build.info
+@@ -95,7 +95,7 @@ $UTIL_COMMON=\
+         cryptlib.c params.c params_from_text.c bsearch.c ex_data.c o_str.c \
+         threads_pthread.c threads_win.c threads_none.c initthread.c \
+         context.c sparse_array.c asn1_dsa.c packet.c param_build.c \
+-        param_build_set.c der_writer.c threads_lib.c params_dup.c
++        param_build_set.c der_writer.c threads_lib.c params_dup.c pathtools.c
+ 
+ SOURCE[../libcrypto]=$UTIL_COMMON \
+         mem.c mem_sec.c \
+diff --git a/crypto/engine/eng_list.c b/crypto/engine/eng_list.c
+index 04c73c7628..a755089f1e 100644
+--- a/crypto/engine/eng_list.c
++++ b/crypto/engine/eng_list.c
+@@ -12,6 +12,7 @@
+ #define OPENSSL_SUPPRESS_DEPRECATED
+ 
+ #include "eng_local.h"
++#include "pathtools.h"
+ 
+ /*
+  * The linked-list of pointers to engine types. engine_list_head incorporates
+@@ -39,6 +40,21 @@ static ENGINE *engine_dyn_list_tail = NULL;
+  * cleanup.
+  */
+ 
++char * enginedir_relocation(const char *path)
++{
++  char exe_path[PATH_MAX];
++  get_executable_path (NULL, &exe_path[0], sizeof(exe_path)/sizeof(exe_path[0]));
++  if (strrchr (exe_path, '/') != NULL)
++  {
++     strrchr (exe_path, '/')[1] = '\0';
++  }
++  char * rel_to_datadir = get_relative_path (OPENSSLBIN, path);
++  strcat (exe_path, rel_to_datadir);
++  free(rel_to_datadir);
++  simplify_path (&exe_path[0]);
++  return malloc_copy_string(exe_path);
++}
++
+ static void engine_list_cleanup(void)
+ {
+     ENGINE *iterator = engine_list_head;
+@@ -413,8 +429,13 @@ ENGINE *ENGINE_by_id(const char *id)
+      * Prevent infinite recursion if we're looking for the dynamic engine.
+      */
+     if (strcmp(id, "dynamic")) {
+-        if ((load_dir = ossl_safe_getenv("OPENSSL_ENGINES")) == NULL)
+-            load_dir = ENGINESDIR;
++        if ((load_dir = ossl_safe_getenv("OPENSSL_ENGINES")) == NULL) {
++            static char * reloc = NULL;
++            if (reloc == NULL) {
++                reloc = enginedir_relocation(ENGINESDIR);
++            }
++            load_dir = reloc;
++        }
+         iterator = ENGINE_by_id("dynamic");
+         if (!iterator || !ENGINE_ctrl_cmd_string(iterator, "ID", id, 0) ||
+             !ENGINE_ctrl_cmd_string(iterator, "DIR_LOAD", "2", 0) ||
+diff --git a/crypto/x509/x509_def.c b/crypto/x509/x509_def.c
+index b8bdcb4841..6cd78ae05b 100644
+--- a/crypto/x509/x509_def.c
++++ b/crypto/x509/x509_def.c
+@@ -9,27 +9,59 @@
+ 
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
++#include "pathtools.h"
+ #include <openssl/crypto.h>
+ #include <openssl/x509.h>
+ 
++char * openssl_relocation(const char *path)
++{
++  char exe_path[PATH_MAX];
++  get_executable_path (NULL, &exe_path[0], sizeof(exe_path)/sizeof(exe_path[0]));
++  if (strrchr (exe_path, '/') != NULL)
++  {
++     strrchr (exe_path, '/')[1] = '\0';
++  }
++  char * rel_to_datadir = get_relative_path (OPENSSLBIN, path);
++  strcat (exe_path, rel_to_datadir);
++  free(rel_to_datadir);
++  simplify_path (&exe_path[0]);
++  return malloc_copy_string(exe_path);
++}
++
+ const char *X509_get_default_private_dir(void)
+ {
+-    return X509_PRIVATE_DIR;
++    static char * reloc = NULL;
++    if (reloc == NULL) {
++        reloc = openssl_relocation(X509_PRIVATE_DIR);
++    }
++    return reloc;
+ }
+ 
+ const char *X509_get_default_cert_area(void)
+ {
+-    return X509_CERT_AREA;
++    static char * reloc = NULL;
++    if (reloc == NULL) {
++        reloc = openssl_relocation(X509_CERT_AREA);
++    }
++    return reloc;
+ }
+ 
+ const char *X509_get_default_cert_dir(void)
+ {
+-    return X509_CERT_DIR;
++    static char * reloc = NULL;
++    if (reloc == NULL) {
++        reloc = openssl_relocation(X509_CERT_DIR);
++    }
++    return reloc;
+ }
+ 
+ const char *X509_get_default_cert_file(void)
+ {
+-    return X509_CERT_FILE;
++    static char * reloc = NULL;
++    if (reloc == NULL) {
++        reloc = openssl_relocation(X509_CERT_FILE);
++    }
++    return reloc;
+ }
+ 
+ const char *X509_get_default_cert_dir_env(void)
+-- 
+2.30.0.windows.1
+
