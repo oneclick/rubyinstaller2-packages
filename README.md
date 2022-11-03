@@ -25,26 +25,27 @@ repman add ci.ri2 "https://github.com/oneclick/rubyinstaller2-packages/releases/
 
 You can then install or update MSYS2-MINGW ruby like so:
 ```sh
-pacman -Sy mingw-w64-x86_64-ruby24
+pacman -Sy mingw-w64-ucrt-x86_64-ruby31
 ```
 
 ## Build packages for yourself
 Second option is to clone git repository to your machine and build it for yourself.
-Assuming you have a properly installed MSYS2 environment and build tools, you can build any package using the following command:
+Assuming you have a properly installed MSYS2 environment and build tools, you can build any package using the following command.
+Replace `${package-name}` with the package name in question:
 ```sh
-   cd ${package-name}
-   MINGW_ARCH=mingw64 makepkg-mingw -sLf
+   cd mingw-w64-${package-name}
+   MINGW_ARCH=ucrt64 makepkg-mingw -sLf
 ```
 
 Or in a CMD shell:
 ```sh
-   cd ${package-name}
+   cd mingw-w64-${package-name}
    ridk enable
-   set MINGW_ARCH=mingw64
+   set MINGW_ARCH=ucrt64
    sh -c "makepkg-mingw -sLf"
 ```
 
 After that you can install the freshly built package(s) with the following command:
 ```sh
-   pacman -U ${package-name}*.pkg.tar.zst
+   pacman -U mingw-w64-ucrt-x86_64-${package-name}*.pkg.tar.zst
 ```
