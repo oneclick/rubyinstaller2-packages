@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20221216
+pkgver=r20221003
 pkgver() {
   echo r`date +%Y%m%d`
 }
@@ -46,8 +46,8 @@ prepare() {
 build() {
 
   CPPFLAGS+=" -DFD_SETSIZE=2048"
-  CFLAGS="-O3 -pipe -fno-fast-math -fstack-protector-strong"
-  LDFLAGS="-save-temps -s -fstack-protector-strong"
+  CFLAGS="-O3 -fno-fast-math -fstack-protector-strong"
+  LDFLAGS="-pipe -s -fstack-protector-strong"
 
   [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
   mkdir -p "${srcdir}/build-${MINGW_CHOST}" && cd "${srcdir}/build-${MINGW_CHOST}"
