@@ -43,6 +43,7 @@ sha256sums=('4ee161939826bcdfdafa757cf8e293a7f14e357f62be7144f040335cc8c7371a'
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver2}
+  rm -rf ${srcdir}/ruby-${pkgver2}/ext/win32/dll_directory
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
   patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
   patch -p1 -i ${srcdir}/0004-Windows-Fix-encoding-of-Dir.home.patch
