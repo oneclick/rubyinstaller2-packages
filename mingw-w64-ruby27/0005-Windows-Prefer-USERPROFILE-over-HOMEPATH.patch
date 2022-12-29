@@ -1,0 +1,107 @@
+From d0f5dc9eac78ecade459b740ed08795c8df6d129 Mon Sep 17 00:00:00 2001
+From: Lars Kanis <lars@greiz-reinsdorf.de>
+Date: Sun, 18 Dec 2022 21:05:54 +0100
+Subject: [PATCH 03/47] Windows: Prefer USERPROFILE over HOMEPATH
+
+HOMEPATH is set to "\WINDOWS\system32" when running per "runas" session.
+This directory is not writable by ordinary users, leading to errors with many ruby tools.
+Also config files in the home directory are not recognized.
+
+Still keeping HOME at first which is not used by native Windows,
+but by ruby specs and by MSYS2 environment.
+---
+ spec/ruby/core/dir/home_spec.rb | 17 +++++++++++++++++
+ win32/win32.c                   | 18 +++++++++---------
+ 2 files changed, 26 insertions(+), 9 deletions(-)
+
+diff --git a/spec/ruby/core/dir/home_spec.rb b/spec/ruby/core/dir/home_spec.rb
+index c49a18041b..cde6899df2 100644
+--- a/spec/ruby/core/dir/home_spec.rb
++++ b/spec/ruby/core/dir/home_spec.rb
+@@ -32,6 +32,23 @@
+     end
+   end
+ 
++  platform_is :windows do
++    it "retrieves the directory from HOME, USERPROFILE, HOMEDRIVE/HOMEPATH and the WinAPI in that order" do
++      old_dirs = [ENV.delete('HOME'), ENV.delete('USERPROFILE'), ENV.delete('HOMEDRIVE'), ENV.delete('HOMEPATH')]
++
++      Dir.home.should == old_dirs[1].gsub("\\", "/")
++      ENV['HOMEDRIVE'] = "C:"
++      ENV['HOMEPATH'] = "\\rubyspec\\home1"
++      Dir.home.should == "C:/rubyspec/home1"
++      ENV['USERPROFILE'] = "C:\\rubyspec\\home2"
++      Dir.home.should == "C:/rubyspec/home2"
++      ENV['HOME'] = "C:\\rubyspec\\home3"
++      Dir.home.should == "C:/rubyspec/home3"
++    ensure
++      ENV['HOME'], ENV['USERPROFILE'], ENV['HOMEDRIVE'], ENV['HOMEPATH'] = *old_dirs
++    end
++  end
++
+   describe "when called with the current user name" do
+     platform_is :solaris do
+       it "returns the named user's home directory from the user database" do
+diff --git a/win32/win32.c b/win32/win32.c
+index 36335f144f..ca62fe6c6d 100644
+--- a/win32/win32.c
++++ b/win32/win32.c
+@@ -544,7 +544,7 @@ rb_w32_system_tmpdir(WCHAR *path, UINT len)
+   afterwards with xfree.
+ 
+   Try:
+-  HOME, HOMEDRIVE + HOMEPATH and USERPROFILE environment variables
++  HOME, USERPROFILE, HOMEDRIVE + HOMEPATH environment variables
+   Special Folders - Profile and Personal
+ */
+ WCHAR *
+@@ -553,13 +553,17 @@ rb_w32_home_dir(void)
+     WCHAR *buffer = NULL;
+     size_t buffer_len = MAX_PATH, len = 0;
+     enum {
+-        HOME_NONE, ENV_HOME, ENV_DRIVEPATH, ENV_USERPROFILE
++        HOME_NONE, ENV_HOME, ENV_USERPROFILE, ENV_DRIVEPATH
+     } home_type = HOME_NONE;
+ 
+     if ((len = GetEnvironmentVariableW(L"HOME", NULL, 0)) != 0) {
+         buffer_len = len;
+         home_type = ENV_HOME;
+     }
++    else if ((len = GetEnvironmentVariableW(L"USERPROFILE", NULL, 0)) != 0) {
++        buffer_len = len;
++        home_type = ENV_USERPROFILE;
++    }
+     else if ((len = GetEnvironmentVariableW(L"HOMEDRIVE", NULL, 0)) != 0) {
+         buffer_len = len;
+         if ((len = GetEnvironmentVariableW(L"HOMEPATH", NULL, 0)) != 0) {
+@@ -567,10 +571,6 @@ rb_w32_home_dir(void)
+             home_type = ENV_DRIVEPATH;
+         }
+     }
+-    else if ((len = GetEnvironmentVariableW(L"USERPROFILE", NULL, 0)) != 0) {
+-        buffer_len = len;
+-        home_type = ENV_USERPROFILE;
+-    }
+ 
+     /* allocate buffer */
+     buffer = ALLOC_N(WCHAR, buffer_len);
+@@ -579,13 +579,13 @@ rb_w32_home_dir(void)
+       case ENV_HOME:
+         GetEnvironmentVariableW(L"HOME", buffer, buffer_len);
+         break;
++      case ENV_USERPROFILE:
++        GetEnvironmentVariableW(L"USERPROFILE", buffer, buffer_len);
++        break;
+       case ENV_DRIVEPATH:
+         len = GetEnvironmentVariableW(L"HOMEDRIVE", buffer, buffer_len);
+         GetEnvironmentVariableW(L"HOMEPATH", buffer + len, buffer_len - len);
+         break;
+-      case ENV_USERPROFILE:
+-        GetEnvironmentVariableW(L"USERPROFILE", buffer, buffer_len);
+-        break;
+       default:
+         if (!get_special_folder(CSIDL_PROFILE, buffer, buffer_len) &&
+             !get_special_folder(CSIDL_PERSONAL, buffer, buffer_len)) {
+-- 
+2.30.0.windows.1
+

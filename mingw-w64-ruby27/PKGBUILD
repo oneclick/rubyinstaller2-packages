@@ -22,6 +22,8 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
+        0005-Windows-Prefer-USERPROFILE-over-HOMEPATH.patch
+        0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch
         ruby.ico
         rubyw.ico)
 
@@ -29,12 +31,17 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
 
 sha256sums=('b38dff2e1f8ce6e5b7d433f8758752987a6b2adfd9bc7571dbc42ea5d04e3e4c'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
+            '10cd0fd57774c347dbcd9b21709be76f6c47743076e2402b77039edef0ebb654'
+            '7bba11585dc597281e1c616f00a482016d57e5fb983f02fb05ed6260a9858ffd'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver2}
+  rm -rf ext/win32/dll_directory
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
+  patch -p1 -i ${srcdir}/0005-Windows-Prefer-USERPROFILE-over-HOMEPATH.patch -l
+  patch -p1 -i ${srcdir}/0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch -l
 }
 
 build() {
