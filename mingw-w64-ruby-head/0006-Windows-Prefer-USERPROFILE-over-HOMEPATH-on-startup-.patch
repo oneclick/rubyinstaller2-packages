@@ -1,0 +1,55 @@
+From 3fe2118e7db5c6e7ac69aa09fa5b789f8a4e62b5 Mon Sep 17 00:00:00 2001
+From: Lars Kanis <lars@greiz-reinsdorf.de>
+Date: Tue, 27 Dec 2022 00:34:29 +0100
+Subject: [PATCH 47/47] Windows: Prefer USERPROFILE over HOMEPATH on startup as
+ well
+
+---
+ win32/win32.c | 29 ++++++++++++++++-------------
+ 1 file changed, 16 insertions(+), 13 deletions(-)
+
+diff --git a/win32/win32.c b/win32/win32.c
+index ca62fe6c6d..48b1c5117e 100644
+--- a/win32/win32.c
++++ b/win32/win32.c
+@@ -622,21 +622,24 @@ init_env(void)
+ 
+     if (!GetEnvironmentVariableW(L"HOME", env, numberof(env))) {
+         f = FALSE;
+-        if (GetEnvironmentVariableW(L"HOMEDRIVE", env, numberof(env)))
+-            len = lstrlenW(env);
+-        else
+-            len = 0;
+-        if (GetEnvironmentVariableW(L"HOMEPATH", env + len, numberof(env) - len) || len) {
+-            f = TRUE;
+-        }
+-        else if (GetEnvironmentVariableW(L"USERPROFILE", env, numberof(env))) {
++        if (GetEnvironmentVariableW(L"USERPROFILE", env, numberof(env))) {
+             f = TRUE;
+         }
+-        else if (get_special_folder(CSIDL_PROFILE, env, numberof(env))) {
+-            f = TRUE;
+-        }
+-        else if (get_special_folder(CSIDL_PERSONAL, env, numberof(env))) {
+-            f = TRUE;
++        else {
++            if (GetEnvironmentVariableW(L"HOMEDRIVE", env, numberof(env)))
++                len = lstrlenW(env);
++            else
++                len = 0;
++
++            if (GetEnvironmentVariableW(L"HOMEPATH", env + len, numberof(env) - len) || len) {
++                f = TRUE;
++            }
++            else if (get_special_folder(CSIDL_PROFILE, env, numberof(env))) {
++                f = TRUE;
++            }
++            else if (get_special_folder(CSIDL_PERSONAL, env, numberof(env))) {
++                f = TRUE;
++            }
+         }
+         if (f) {
+             regulate_path(env);
+-- 
+2.30.0.windows.1
+
