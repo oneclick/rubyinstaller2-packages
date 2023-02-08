@@ -3,7 +3,7 @@
 _realname=openssl
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-_ver=1.1.1s
+_ver=1.1.1t
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
 pkgrel=1
@@ -23,7 +23,7 @@ source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz{,.asc}
         'pathtools.h'
         'openssl-1.1.1-relocation.patch'
         'openssl-1.1.1-mingw-arm.patch')
-sha256sums=('c5ac01e760ee6ff0dab61d6b2bbd30146724d063eb322180c6f18a6f74e4b6aa'
+sha256sums=('SKIP'
             'SKIP'
             '703cd0cb74e714f9e66d26de11c109dd76fab07e723af8dde56a35ea65102e5f'
             '4f9d325265ef6f4e90ad637dea41afa6995388c921fe961ad5dc895aca10318b'
