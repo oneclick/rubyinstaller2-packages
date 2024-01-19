@@ -1,0 +1,31 @@
+From be7f76870b3e6abb56c24b60710a00b25bc3f4cf Mon Sep 17 00:00:00 2001
+From: Lars Kanis <larskanis@gmail.com>
+Date: Mon, 25 Dec 2023 15:53:47 +0100
+Subject: [PATCH] [Win32] Return registry strings as UTF-8
+
+Since ruby-3.0 usually all strings from the Windows-API are returned as UTF-8 strings.
+Win32::Registry so far returned OEM encoding.
+This was a leftover from 2.x times.
+This commit changes it to UTF-8.
+
+Fixes: https://github.com/oneclick/rubyinstaller2/issues/348
+---
+ ext/win32/lib/win32/registry.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/win32/lib/win32/registry.rb b/ext/win32/lib/win32/registry.rb
+index b5b99ff684..91f666cdd7 100644
+--- a/ext/win32/lib/win32/registry.rb
++++ b/ext/win32/lib/win32/registry.rb
+@@ -69,7 +69,7 @@ module Win32
+   WCHAR_NUL = "\0".encode(WCHAR).freeze
+   WCHAR_CR = "\r".encode(WCHAR).freeze
+   WCHAR_SIZE = WCHAR_NUL.bytesize
+-  LOCALE = Encoding.find(Encoding.locale_charmap)
++  LOCALE = Encoding::UTF_8
+ 
+   class Registry
+ 
+-- 
+2.26.0.windows.1
+
