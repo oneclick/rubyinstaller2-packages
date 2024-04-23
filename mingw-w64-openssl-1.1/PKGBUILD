@@ -3,7 +3,7 @@
 _realname=openssl
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-_ver=1.1.1t
+_ver=1.1.1w
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
 pkgrel=1
@@ -35,6 +35,7 @@ validpgpkeys=(
   '7953AC1FBC3DC8B3B292393ED5E9E43F7DF9EE8C' # Richard Levitte <richard@levitte.org>
   'A21FAB74B0088AA361152586B8EF1A6BA9DA2D5C' # Tomáš Mráz <tm@t8m.info>
   'B7C1C14360F353A36862E4D5231C84CDDCC69C45' # Paul Dale <pauli@openssl.org>
+  'EFC0A467D613CB83C7ED6D30D894E2CE8B3D79F5' # OpenSSL team <openssl-team@openssl.org>
 )
 
 # Helper macros to help make tasks easier #
