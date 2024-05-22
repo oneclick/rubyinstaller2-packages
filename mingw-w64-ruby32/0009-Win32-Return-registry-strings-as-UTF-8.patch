@@ -8,7 +8,7 @@ Win32::Registry so far returned OEM encoding.
 This was a leftover from 2.x times.
 This commit changes it to UTF-8.
 
-Fixes: https://github.com/oneclick/rubyinstaller2/issues/348
+Fixes: https://github.com/Vishal1309/rubyinstaller2/issues/348
 ---
  ext/win32/lib/win32/registry.rb | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

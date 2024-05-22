@@ -95,7 +95,7 @@ _build_add() {
 _download_previous() {
     local filenames=("${@}")
     for filename in "${filenames[@]}"; do
-        if ! wget --no-verbose "https://github.com/oneclick/rubyinstaller2-packages/releases/download/ci.ri2/${filename}"; then
+        if ! wget --no-verbose "https://github.com/Vishal1309/rubyinstaller2-packages/releases/download/test_tag/${filename}"; then
             rm -f "${filenames[@]}"
             return 1
         fi
@@ -224,7 +224,7 @@ check_recipe_quality() {
     saneman --format='\t%l:%c %p:%c %m' --verbose --no-terminal "${packages[@]}"
 }
 
-# Add ci.ri2 repository to /etc/pacman.conf
+# Add test_tag repository to /etc/pacman.conf
 add_ci_ri2_repo() {
     # install repman
     pacman --noconfirm --sync --needed pactoys
@@ -234,9 +234,9 @@ add_ci_ri2_repo() {
     gpg --export BE8BF1C5 | pacman-key --add -
     pacman-key --lsign-key BE8BF1C5
 
-    repman add ci.ri2 'https://github.com/oneclick/rubyinstaller2-packages/releases/download/ci.ri2'
+    repman add test_tag 'https://github.com/Vishal1309/rubyinstaller2-packages/releases/download/test_tag'
 
-    # Download [ci.ri2] package list
+    # Download [test_tag] package list
     pacman --noconfirm --sync --refresh
     return 0
 }

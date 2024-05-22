@@ -19,8 +19,8 @@ jobs:
     env:
       MINGW_ARCH: ${{ matrix.MINGW_ARCH }}
       APPVEYOR_SCHEDULED_BUILD: ${{ github.event.schedule }}
-      DEPLOY_REPO_NAME: oneclick/rubyinstaller2-packages
-      DEPLOY_TAG: ci.ri2
+      DEPLOY_REPO_NAME: Vishal1309/rubyinstaller2-packages
+      DEPLOY_TAG: test_tag
       DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
 
     steps:
@@ -73,7 +73,7 @@ jobs:
       env:
         GPGPASSWD: ${{ secrets.GPGPASSWD }}
       run: |
-        ridk exec bash -c "source 'ci-library.sh'; deploy_enabled && cd artifacts && create_pacman_repository 'ci.ri2'"
+        ridk exec bash -c "source 'ci-library.sh'; deploy_enabled && cd artifacts && create_pacman_repository 'test_tag'"
 
     - name: Backup pacman database as artifacts
       uses: actions/upload-artifact@v3
