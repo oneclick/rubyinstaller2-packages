@@ -60,17 +60,6 @@ jobs:
         GPGPASSWD: ${{ secrets.GPGPASSWD }}
       run: C:\msys64\usr\bin\bash --login -c "$(cygpath ${GITHUB_WORKSPACE})/ci-build.sh"
 
-    - name: Print GPG configuration
-      shell: bash
-      run: gpg --list-config --list-keys
-
-    - name: Decrypt test file
-      shell: bash
-      env:
-        GPGPASSWD: ${{ secrets.GPGPASSWD }}
-      run: |
-        echo "$GPGPASSWD" | gpg --batch --yes --passphrase-fd 0 --decrypt testfile.txt.gpg
-
     - name: Create lock ID
       shell: cmd
       run: ruby -e 'puts "DEPLOY_LOCK=#{rand}"' >>%GITHUB_ENV%
