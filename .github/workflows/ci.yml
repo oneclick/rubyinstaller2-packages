@@ -57,9 +57,7 @@ jobs:
     - name: Build packages
       shell: cmd
       env:
-        GPGP
-        
-
+        GPGPASSWD: ${{ secrets.GPGPASSWD }}
       run: C:\msys64\usr\bin\bash --login -c "$(cygpath ${GITHUB_WORKSPACE})/ci-build.sh"
 
     - name: Create lock ID
@@ -103,6 +101,9 @@ jobs:
       shell: cmd
       if: ${{ always() }}
       run: rake upload:unlock
+
+
+
 
 
       
