@@ -16,6 +16,9 @@ def repo_release
   token = ENV['DEPLOY_TOKEN']
   client = Octokit::Client.new(access_token: token)
   rel = client.releases(repo).find{|r| r.tag_name==tag }
+  print("CLIENT: ---------------------------------------")
+  print(client)
+  print("ENDCLIENT: ---------------------------------------")
   [client, rel]
 end
 
@@ -23,6 +26,9 @@ def upload_to_github(files:)
   $stderr.puts "Add #{files.size} files to github release"
 
   client, release = repo_release
+  print("RELEASE: ----------------------------------------")
+  print(release)
+  print("ENDRELEASE: ---------------------------------------")
   old_assets = release.assets
 
   files.each do |fname|
