@@ -231,8 +231,8 @@ add_ci_ri2_repo() {
 
     # Trust public signature key
     pacman-key --init
-    gpg --export BE8BF1C5 | pacman-key --add -
-    pacman-key --lsign-key BE8BF1C5
+    gpg --export DBB0BF741AAD3643 | pacman-key --add -
+    pacman-key --lsign-key DBB0BF741AAD3643
 
     repman add test_tag 'https://github.com/Vishal1309/rubyinstaller2-packages/releases/download/test_tag'
 
