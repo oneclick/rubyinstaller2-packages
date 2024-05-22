@@ -7,7 +7,8 @@
 # Configure
 cd "$(dirname "$0")"
 source 'ci-library.sh'
-deploy_enabled && mkdir artifacts
+# deploy_enabled && mkdir artifacts
+mkdir artifacts
 git_config user.email 'jayesh.s@iitgn.ac.in'
 git_config user.name  'Vishal1309'
 git remote add upstream 'https://github.com/Vishal1309/rubyinstaller2-packages'
@@ -15,8 +16,8 @@ git fetch --quiet upstream
 
 # Decrypt and import private sigature key
 message 'pls help'
-message "${GPGPASSWD}"
-deploy_enabled && (gpg --batch --passphrase "${GPGPASSWD}" --decrypt appveyor-key.asc.asc | gpg --import)
+# message "${GPGPASSWD}"
+# deploy_enabled && (gpg --batch --passphrase "${GPGPASSWD}" --decrypt appveyor-key.asc.asc | gpg --import)
 
 # Detect
 if [ -z "${APPVEYOR_SCHEDULED_BUILD}" ]
@@ -42,7 +43,8 @@ for package in "${packages[@]}"; do
         execute "Building binary for arch ${MINGW_ARCH}" makepkg-mingw --noconfirm --skippgpcheck --nocheck --syncdeps --rmdeps --cleanbuild --sign
     #     execute 'Installing' yes:pacman --upgrade *.pkg.tar.zst
     #     execute 'Uninstalling' yes:pacman --remove --recursive --cascade --noconfirm "${package/mingw-w64/mingw-w64-i686}" "${package/mingw-w64/mingw-w64-x86_64}" "${package/mingw-w64/mingw-w64-ucrt-x86_64}"
-        deploy_enabled && mv "${package}"/*.pkg.tar.zst "${package}"/*.pkg.tar.zst.sig artifacts
+        # deploy_enabled && mv "${package}"/*.pkg.tar.zst "${package}"/*.pkg.tar.zst.sig artifacts
+        mv "${package}"/*.pkg.tar.zst "${package}"/*.pkg.tar.zst.sig artifacts
     #     deploy_enabled && drop_old_bintray_versions "${package}"
     else
         execute "skip unsupported package arch ${MINGW_ARCH}"

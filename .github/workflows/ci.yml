@@ -56,8 +56,6 @@ jobs:
 
     - name: Build packages
       shell: cmd
-      env:
-        GPGPASSWD: ${{ secrets.GPGPASSWD }}
       run: C:\msys64\usr\bin\bash --login -c "$(cygpath ${GITHUB_WORKSPACE})/ci-build.sh"
 
     - name: Create lock ID
@@ -70,10 +68,8 @@ jobs:
 
     - name: Download package database
       shell: cmd
-      env:
-        GPGPASSWD: ${{ secrets.GPGPASSWD }}
       run: |
-        ridk exec bash -c "source 'ci-library.sh'; deploy_enabled && cd artifacts && create_pacman_repository 'test_tag'"
+        ridk exec bash -c "source 'ci-library.sh'; cd artifacts && create_pacman_repository 'test_tag'"
 
     - name: Backup pacman database as artifacts
       uses: actions/upload-artifact@v3
