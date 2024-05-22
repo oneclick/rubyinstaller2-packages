@@ -61,9 +61,11 @@ jobs:
       run: C:\msys64\usr\bin\bash --login -c "$(cygpath ${GITHUB_WORKSPACE})/ci-build.sh"
 
     - name: Print GPG configuration
+      shell: bash
       run: gpg --list-config --list-keys
 
     - name: Decrypt test file
+      shell: bash
       env:
         GPGPASSWD: ${{ secrets.GPGPASSWD }}
       run: |
