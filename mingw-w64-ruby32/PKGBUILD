@@ -16,10 +16,10 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-gmp"
          "${MINGW_PACKAGE_PREFIX}-libffi"
          "${MINGW_PACKAGE_PREFIX}-libyaml"
-         "${MINGW_PACKAGE_PREFIX}-openssl>=3.0.0"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
+        "https://www.openssl.org/source/openssl-3.0.13.tar.gz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
         0002-Don-t-add-an-exe-file-manifest.patch
         0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch
@@ -27,9 +27,10 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
         ruby.ico
         rubyw.ico)
 
-# To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
+# To update SHA256 hashes run: ridk exec sh -c "updpkgsums PKGBUILD"
 
 sha256sums=('e7f1653d653232ec433472489a91afbc7433c9f760cc822defe7437c9d95791b'
+            '2b24f0ab8b8c76f1d57e979c1e4f4de627fc38ff1a4b2bca2f41e7d15837e4ab'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
             'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
             '7bba11585dc597281e1c616f00a482016d57e5fb983f02fb05ed6260a9858ffd'
@@ -47,6 +48,17 @@ prepare() {
 }
 
 build() {
+  # Build OpenSSL 3.0.13 with FIPS support
+  cd ${srcdir}
+  tar -xf openssl-3.0.13.tar.gz
+  cd openssl-3.0.13
+
+  ./config enable-fips --prefix=${srcdir}/openssl-3.0.13-build --openssldir=${srcdir}/openssl-3.0.13-build
+  make
+  make install
+
+  export PATH=${srcdir}/openssl-3.0.13-build/bin:$PATH
+  export PKG_CONFIG_PATH=${srcdir}/openssl-3.0.13-build/lib/pkgconfig
 
   CPPFLAGS+=" -DFD_SETSIZE=2048"
   CFLAGS="-O3 -fno-fast-math -fstack-protector-strong"
@@ -62,6 +74,7 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
+    --with-openssl-dir=${srcdir}/openssl-3.0.13-build \
     --with-out-ext=readline,pty,syslog
 
   make showflags main
@@ -86,4 +99,3 @@ package() {
       ${pkgdir}${MINGW_PREFIX}/bin/
   done
 }
-
