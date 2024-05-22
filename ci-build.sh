@@ -15,6 +15,7 @@ git fetch --quiet upstream
 
 # Decrypt and import private sigature key
 message 'pls help'
+message '${GPGPASSWD}'
 deploy_enabled && (gpg --batch --passphrase "${GPGPASSWD}" --decrypt appveyor-key.asc.asc | gpg --import)
 
 # Detect
