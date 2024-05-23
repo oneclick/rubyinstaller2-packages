@@ -60,9 +60,14 @@ build() {
 
   export PATH=${srcdir}/openssl-3.0.13-build/bin:$PATH
   export PKG_CONFIG_PATH=${srcdir}/openssl-3.0.13-build/lib64/pkgconfig
+  export LDFLAGS="-L${srcdir}/openssl-3.0.13-build/lib64"
+  export CPPFLAGS="-I${srcdir}/openssl-3.0.13-build/include"
+
 
   echo "PATH: $PATH"
   echo "PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
+  echo "LDFLAGS: $LDFLAGS"
+  echo "CPPFLAGS: $CPPFLAGS"
 
   echo "openssl-3.0.13-build -->"
   ls ${srcdir}/openssl-3.0.13-build/
@@ -99,7 +104,7 @@ build() {
   echo "settings flags now"
   CPPFLAGS+=" -DFD_SETSIZE=2048"
   CFLAGS="-O3 -fno-fast-math -fstack-protector-strong"
-  LDFLAGS="-pipe -s -fstack-protector-strong"
+  LDFLAGS="-pipe -s -fstack-protector-strong -L${srcdir}/openssl-3.0.13-build/lib64"
   RUBY_CONFIGURE_OPTS="--with-openssl-dir=${srcdir}/openssl-3.0.13-build"
   echo "flags are set"
 
