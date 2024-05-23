@@ -77,8 +77,8 @@ build() {
   ls ${srcdir}/openssl-3.0.13-build/lib64/pkgconfig
   echo "--------------------"
 
-  echo "ls build mingwchost --->"
-  ls ${srcdir}/build-${MINGW_CHOST}
+  echo "cat openssl.pc --->"
+  ls ${srcdir}/openssl-3.0.13-build/lib64/pkgconfig/openssl.pc
   echo "--------------------"
   echo "cat ext openssl mkmf --->"
   cat ${srcdir}/${_realname}-${pkgver2}/ext/openssl/mkmf.log
