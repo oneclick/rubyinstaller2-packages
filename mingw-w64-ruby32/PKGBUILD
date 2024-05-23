@@ -66,8 +66,7 @@ build() {
 
   ls ${srcdir}/openssl-3.0.13-build/
   ls ${srcdir}/openssl-3.0.13-build/bin
-  ls ${srcdir}/openssl-3.0.13-build/ssl
-  ls ${srcdir}/openssl-3.0.13-build/lib
+  ls ${srcdir}/openssl-3.0.13-build/lib64
 
 
   cat ${srcdir}/build-${MINGW_CHOST}/config.log
@@ -78,6 +77,7 @@ build() {
   CPPFLAGS+=" -DFD_SETSIZE=2048"
   CFLAGS="-O3 -fno-fast-math -fstack-protector-strong"
   LDFLAGS="-pipe -s -fstack-protector-strong"
+  RUBY_CONFIGURE_OPTS="--with-openssl-dir=${srcdir}/openssl-3.0.13-build"
   echo "flags are set"
 
   echo "making ruby build directories"
