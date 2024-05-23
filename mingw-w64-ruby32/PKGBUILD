@@ -52,7 +52,7 @@ build() {
   cd ${srcdir}
   tar -xf openssl-3.0.13.tar.gz
   cd openssl-3.0.13
-
+  echo "configuring openssl now"
   ./config enable-fips --prefix=${srcdir}/openssl-3.0.13-build --openssldir=${srcdir}/openssl-3.0.13-build
   make
   make install
