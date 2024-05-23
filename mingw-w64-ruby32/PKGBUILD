@@ -97,6 +97,9 @@ build() {
   echo "ls openssl --->"
   ls ${srcdir}/${_realname}-${pkgver2}/ext/openssl
   echo "--------------------"
+  echo "cat openssl/extconf.rb --->"
+  cat ${srcdir}/${_realname}-${pkgver2}/ext/openssl/extconf.rb
+  echo "--------------------"
   # echo "cat config should fail ideally --->"
   # cat ${srcdir}/build-${MINGW_CHOST}/config.log
 

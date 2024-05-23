@@ -40,7 +40,7 @@ execute 'Approving recipe quality' check_recipe_quality
 for package in "${packages[@]}"; do
     arch_matches=$( sh -c "source ${package}/PKGBUILD && if [[ \" \${mingw_arch[@]} \" =~ \" ${MINGW_ARCH} \" ]]; then echo yes; fi " )
     if [[ ${arch_matches} == "yes" ]]; then
-        execute "Building binary for arch ${MINGW_ARCH}" makepkg-mingw --noconfirm --skippgpcheck --nocheck --syncdeps --rmdeps --cleanbuild --sign
+        execute "Building binary for arch ${MINGW_ARCH}" makepkg-mingw --noconfirm --skippgpcheck --nocheck --syncdeps --rmdeps --cleanbuild
     #     execute 'Installing' yes:pacman --upgrade *.pkg.tar.zst
     #     execute 'Uninstalling' yes:pacman --remove --recursive --cascade --noconfirm "${package/mingw-w64/mingw-w64-i686}" "${package/mingw-w64/mingw-w64-x86_64}" "${package/mingw-w64/mingw-w64-ucrt-x86_64}"
         # deploy_enabled && mv "${package}"/*.pkg.tar.zst "${package}"/*.pkg.tar.zst.sig artifacts
