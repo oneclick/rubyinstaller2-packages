@@ -74,7 +74,7 @@ build() {
   ls ${srcdir}/openssl-3.0.13-build/lib64
   echo "--------------------"
   echo "pkgconfig ---->"
-  ls ${srcdir}/openssl-3.0.13-build/pkgconfig
+  ls ${srcdir}/openssl-3.0.13-build/lib64/pkgconfig
   echo "--------------------"
 
   echo "ls build mingwchost --->"
