@@ -59,18 +59,32 @@ build() {
   echo "make install has run now"
 
   export PATH=${srcdir}/openssl-3.0.13-build/bin:$PATH
-  export PKG_CONFIG_PATH=${srcdir}/openssl-3.0.13-build/lib/pkgconfig
+  export PKG_CONFIG_PATH=${srcdir}/openssl-3.0.13-build/lib64/pkgconfig
 
   echo "PATH: $PATH"
   echo "PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
 
+  echo "openssl-3.0.13-build -->"
   ls ${srcdir}/openssl-3.0.13-build/
+  echo "--------------------"
+  echo "bin -->"
   ls ${srcdir}/openssl-3.0.13-build/bin
+  echo "--------------------"
+  echo "lib64 ---->"
   ls ${srcdir}/openssl-3.0.13-build/lib64
+  echo "--------------------"
+  echo "pkgconfig ---->"
+  ls ${srcdir}/openssl-3.0.13-build/pkgconfig
+  echo "--------------------"
 
-
-  cat ${srcdir}/build-${MINGW_CHOST}/config.log
+  echo "ls build mingwchost --->"
+  ls ${srcdir}/build-${MINGW_CHOST}
+  echo "--------------------"
+  echo "cat ext openssl mkmf --->"
   cat ${srcdir}/${_realname}-${pkgver2}/ext/openssl/mkmf.log
+  echo "--------------------"
+  # echo "cat config should fail ideally --->"
+  # cat ${srcdir}/build-${MINGW_CHOST}/config.log
 
 
   echo "settings flags now"
