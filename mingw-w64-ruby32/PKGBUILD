@@ -83,8 +83,14 @@ build() {
   echo "cat ossl-modules --->"
   ls ${srcdir}/openssl-3.0.13-build/lib64/ossl-modules
   echo "--------------------"
-  echo "ls pkgver2 --->"
+  echo "ls ext openssl mkmf --->"
   ls ${srcdir}/${_realname}-${pkgver2}
+  echo "--------------------"
+  echo "ls ext --->"
+  ls ${srcdir}/${_realname}-${pkgver2}/ext
+  echo "--------------------"
+  echo "ls openssl --->"
+  ls ${srcdir}/${_realname}-${pkgver2}/ext/openssl
   echo "--------------------"
   # echo "cat config should fail ideally --->"
   # cat ${srcdir}/build-${MINGW_CHOST}/config.log
