@@ -64,7 +64,9 @@ build() {
   echo "PATH: $PATH"
   echo "PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
 
+  ls ${srcdir}/openssl-3.0.13-build/
   ls ${srcdir}/openssl-3.0.13-build/bin
+  ls ${srcdir}/openssl-3.0.13-build/ssl
   ls ${srcdir}/openssl-3.0.13-build/lib
 
 
