@@ -56,19 +56,33 @@ build() {
   ./config enable-fips --prefix=${srcdir}/openssl-3.0.13-build --openssldir=${srcdir}/openssl-3.0.13-build
   make
   make install
+  echo "make install has run now"
 
   export PATH=${srcdir}/openssl-3.0.13-build/bin:$PATH
   export PKG_CONFIG_PATH=${srcdir}/openssl-3.0.13-build/lib/pkgconfig
 
+  echo "$PATH"
+  echo "${PATH}"
+  echo "{$PATH}"
+  echo "$PKG_CONFIG_PATH"
+  echo "${PKG_CONFIG_PATH}"
+  echo "{$PKG_CONFIG_PATH}"
+
+  echo "settings flags now"
   CPPFLAGS+=" -DFD_SETSIZE=2048"
   CFLAGS="-O3 -fno-fast-math -fstack-protector-strong"
   LDFLAGS="-pipe -s -fstack-protector-strong"
+  echo "flags are set"
 
+  echo "making ruby build directories"
   [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
   mkdir -p "${srcdir}/build-${MINGW_CHOST}" && cd "${srcdir}/build-${MINGW_CHOST}"
+  echo "finish making ruby build directories"
 
+  echo "cp .ico step"
   cp ${srcdir}/*.ico .
 
+  echo "configure step with openssl-dir"
   ../${_realname}-${pkgver2}/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
@@ -77,6 +91,7 @@ build() {
     --with-openssl-dir=${srcdir}/openssl-3.0.13-build \
     --with-out-ext=readline,pty,syslog
 
+  echo "generate RI"
   make showflags main
   echo "Generate RI and HTML documentation"
   # Make rdoc outputs so many lines -> print dots only
