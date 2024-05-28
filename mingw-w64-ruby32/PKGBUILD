@@ -116,7 +116,7 @@ build() {
   CPPFLAGS+=" -DFD_SETSIZE=2048"
   CFLAGS="-O3 -fno-fast-math -fstack-protector-strong"
   LDFLAGS="-pipe -s -fstack-protector-strong -L${srcdir}/openssl-3.0.13-build/lib64"
-  export RUBY_CONFIGURE_OPTS="--with-openssl-dir=${srcdir}/openssl-3.0.13-build"
+  export RUBY_CONFIGURE_OPTS="--with-openssl-dir=${srcdir}/openssl-3.0.13-build/include/openssl"
   echo "flags are set"
   echo "RUBY_CONFIGURE_OPTS= ${RUBY_CONFIGURE_OPTS}"
 
