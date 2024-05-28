@@ -88,9 +88,15 @@ build() {
   cat ${srcdir}/openssl-3.0.13-build/lib64/pkgconfig/openssl.pc
   echo "--------------------"
   echo "cat ossl-modules --->"
+  echo "cat ${srcdir}/openssl-3.0.13-build/lib64/ossl-modules"
   ls ${srcdir}/openssl-3.0.13-build/lib64/ossl-modules
   echo "--------------------"
+  echo "check ssl.h --->"
+  echo "find . -name thingy"
+  find ${srcdir}/${_realname}-${pkgver2}/ -name "*ssl*"
+  echo "--------------------"
   echo "ls ext openssl mkmf --->"
+  echo "ls ${srcdir}/${_realname}-${pkgver2}"
   ls ${srcdir}/${_realname}-${pkgver2}
   echo "--------------------"
   echo "ls ext --->"
