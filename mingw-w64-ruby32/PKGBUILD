@@ -134,7 +134,7 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --with-openssl-dir=${srcdir}/openssl-3.0.13-build \
+    --with-openssl-dir=${srcdir}/openssl-3.0.13-build/include/openssl \
     --with-bundled-md5 \
     --with-out-ext=readline,pty,syslog
 
