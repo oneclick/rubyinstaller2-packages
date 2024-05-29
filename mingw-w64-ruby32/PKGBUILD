@@ -60,7 +60,7 @@ build() {
 
 
 
-  export PATH=${srcdir}/openssl-3.0.13-build/bin:$PATH
+  export PATH=${srcdir}/openssl-3.0.13-build/include/openssl:$PATH
   export PKG_CONFIG_PATH=${srcdir}/openssl-3.0.13-build/lib64/pkgconfig
   export LDFLAGS="-L${srcdir}/openssl-3.0.13-build/lib64"
   export CPPFLAGS="-I${srcdir}/openssl-3.0.13-build/include"
