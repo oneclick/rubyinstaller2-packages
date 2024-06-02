@@ -1,0 +1,111 @@
+From b13cf49036f0a454063cde25807785adc00f8995 Mon Sep 17 00:00:00 2001
+From: Takashi Kokubun <takashikkbn@gmail.com>
+Date: Thu, 30 May 2024 11:13:15 -0700
+Subject: [PATCH] merge revision(s)
+ 055613fd868a8c94e43893f8c58a00cdd2a81f6d,127d7a35df10ee2bc99f44b888972b2c5361d84f,e2a9b87126d59e4766479a7aa12cf7a648f46506:
+ [Backport #20447]
+
+	Fix pointer incompatiblity
+
+	Since the subsecond part is discarded, WIDEVAL to VALUE conversion is
+	needed.
+
+	Some functions are not used when `THREAD_MODEL=none`
+
+	`rb_thread_sched_destroy` is not used now at all
+---
+ thread.c       | 4 +++-
+ thread_none.c  | 2 ++
+ thread_win32.c | 2 ++
+ time.c         | 2 +-
+ version.h      | 2 +-
+ 5 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/thread.c b/thread.c
+index e756238ba6..abd91e1e2e 100644
+--- a/thread.c
++++ b/thread.c
+@@ -146,7 +146,7 @@ static int rb_threadptr_pending_interrupt_empty_p(const rb_thread_t *th);
+ static const char *thread_status_name(rb_thread_t *th, int detail);
+ static int hrtime_update_expire(rb_hrtime_t *, const rb_hrtime_t);
+ NORETURN(static void async_bug_fd(const char *mesg, int errno_arg, int fd));
+-static int consume_communication_pipe(int fd);
++MAYBE_UNUSED(static int consume_communication_pipe(int fd));
+ 
+ static volatile int system_working = 1;
+ static rb_internal_thread_specific_key_t specific_key_count;
+@@ -263,6 +263,8 @@ timeout_prepare(rb_hrtime_t **to, rb_hrtime_t *rel, rb_hrtime_t *end,
+ }
+ 
+ MAYBE_UNUSED(NOINLINE(static int thread_start_func_2(rb_thread_t *th, VALUE *stack_start)));
++MAYBE_UNUSED(static bool th_has_dedicated_nt(const rb_thread_t *th));
++MAYBE_UNUSED(static int waitfd_to_waiting_flag(int wfd_event));
+ 
+ #include THREAD_IMPL_SRC
+ 
+diff --git a/thread_none.c b/thread_none.c
+index 4d53d3bf4d..d3b533110e 100644
+--- a/thread_none.c
++++ b/thread_none.c
+@@ -46,10 +46,12 @@ rb_thread_sched_init(struct rb_thread_sched *sched, bool atfork)
+ {
+ }
+ 
++#if 0
+ static void
+ rb_thread_sched_destroy(struct rb_thread_sched *sched)
+ {
+ }
++#endif
+ 
+ // Do nothing for mutex guard
+ void
+diff --git a/thread_win32.c b/thread_win32.c
+index bd983e0bd9..4fd488db60 100644
+--- a/thread_win32.c
++++ b/thread_win32.c
+@@ -154,6 +154,7 @@ rb_thread_sched_init(struct rb_thread_sched *sched, bool atfork)
+     sched->lock = w32_mutex_create();
+ }
+ 
++#if 0
+ // per-ractor
+ void
+ rb_thread_sched_destroy(struct rb_thread_sched *sched)
+@@ -161,6 +162,7 @@ rb_thread_sched_destroy(struct rb_thread_sched *sched)
+     if (GVL_DEBUG) fprintf(stderr, "sched destroy\n");
+     CloseHandle(sched->lock);
+ }
++#endif
+ 
+ rb_thread_t *
+ ruby_thread_from_native(void)
+diff --git a/time.c b/time.c
+index bef9a9e231..25098e7e76 100644
+--- a/time.c
++++ b/time.c
+@@ -2342,7 +2342,7 @@ zone_timelocal(VALUE zone, VALUE time)
+     struct time_object *tobj = RTYPEDDATA_GET_DATA(time);
+     wideval_t t, s;
+ 
+-    split_second(tobj->timew, &t, &s);
++    wdivmod(tobj->timew, WINT2FIXWV(TIME_SCALE), &t, &s);
+     tm = tm_from_time(rb_cTimeTM, time);
+     utc = rb_check_funcall(zone, id_local_to_utc, 1, &tm);
+     if (UNDEF_P(utc)) return 0;
+diff --git a/version.h b/version.h
+index adc09297e8..e84e068724 100644
+--- a/version.h
++++ b/version.h
+@@ -11,7 +11,7 @@
+ # define RUBY_VERSION_MINOR RUBY_API_VERSION_MINOR
+ #define RUBY_VERSION_TEENY 2
+ #define RUBY_RELEASE_DATE RUBY_RELEASE_YEAR_STR"-"RUBY_RELEASE_MONTH_STR"-"RUBY_RELEASE_DAY_STR
+-#define RUBY_PATCHLEVEL 78
++#define RUBY_PATCHLEVEL 79
+ 
+ #include "ruby/version.h"
+ #include "ruby/internal/abi.h"
+-- 
+2.26.0.windows.1
+
