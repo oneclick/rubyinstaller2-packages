@@ -1,14 +1,14 @@
-From ffb58ea8b401e85474972cdba5be036c12b1fe2f Mon Sep 17 00:00:00 2001
+From 40a7b4ff5aadb591adc5cd8a6f6240f446c65d4a Mon Sep 17 00:00:00 2001
 From: Lars Kanis <lars@greiz-reinsdorf.de>
 Date: Mon, 20 May 2024 14:54:44 +0200
-Subject: [PATCH] Windows: Use ATOMIC_PTR functions to avoid compiler warnings
+Subject: [PATCH] Mingw32: Use ATOMIC_PTR functions to avoid compiler warnings
  due to incompatible types
 
 HCRYPTPROV can be casted to pointer without warning but not to size_t.
 Avoids the following warning/error:
 
 ../snapshot-master/random.c: In function 'fill_random_bytes_crypt':
-../snapshot-master/include/ruby/atomic.h:246:28: warning: passing argument 1 of 'rbimpl_atomic_size_cas' from incompatible pointer type [-Wincompatible-pointer-types]
+../snapshot-master/include/ruby/atomic.h:246:28: error: passing argument 1 of 'rbimpl_atomic_size_cas' from incompatible pointer type [-Wincompatible-pointer-types]
   246 |     rbimpl_atomic_size_cas(&(var), (oldval), (newval))
       |                            ^~~~~~
       |                            |
@@ -18,7 +18,6 @@ Avoids the following warning/error:
       |                                              ^~~~~~~~~~~~~~~~~~~~
 ../snapshot-master/random.c:594:32: note: in expansion of macro 'ATOMIC_SIZE_CAS'
   594 |         old_prov = (HCRYPTPROV)ATOMIC_SIZE_CAS(perm_prov, 0, prov);
-compiling ../snapshot-master/range.c
       |                                ^~~~~~~~~~~~~~~
 ../snapshot-master/include/ruby/atomic.h:853:41: note: expected 'volatile size_t *' {aka 'volatile unsigned int *'} but argument is of type 'HCRYPTPROV *' {aka 'long unsigned int *'}
   853 | rbimpl_atomic_size_cas(volatile size_t *ptr, size_t oldval, size_t newval)
@@ -28,26 +27,26 @@ compiling ../snapshot-master/range.c
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/random.c b/random.c
-index ea76ea656f..1986cf5f20 100644
+index f3dec5cca2..6de04d4f6b 100644
 --- a/random.c
 +++ b/random.c
-@@ -576,7 +576,7 @@ static void
+@@ -551,7 +551,7 @@ static void
  release_crypt(void *p)
  {
      HCRYPTPROV *ptr = p;
 -    HCRYPTPROV prov = (HCRYPTPROV)ATOMIC_SIZE_EXCHANGE(*ptr, INVALID_HCRYPTPROV);
 +    HCRYPTPROV prov = (HCRYPTPROV)ATOMIC_PTR_EXCHANGE(*((char *)ptr), (char *)INVALID_HCRYPTPROV);
      if (prov && prov != INVALID_HCRYPTPROV) {
-         CryptReleaseContext(prov, 0);
+ 	CryptReleaseContext(prov, 0);
      }
-@@ -591,7 +591,7 @@ fill_random_bytes_crypt(void *seed, size_t size)
-         if (!CryptAcquireContext(&prov, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
-             prov = INVALID_HCRYPTPROV;
-         }
--        old_prov = (HCRYPTPROV)ATOMIC_SIZE_CAS(perm_prov, 0, prov);
-+        old_prov = (HCRYPTPROV)ATOMIC_PTR_CAS(*((char *)&perm_prov), 0, (char *)prov);
-         if (LIKELY(!old_prov)) { /* no other threads acquired */
-             if (prov != INVALID_HCRYPTPROV) {
+@@ -566,7 +566,7 @@ fill_random_bytes_crypt(void *seed, size_t size)
+ 	if (!CryptAcquireContext(&prov, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
+ 	    prov = INVALID_HCRYPTPROV;
+ 	}
+-	old_prov = (HCRYPTPROV)ATOMIC_SIZE_CAS(perm_prov, 0, prov);
++    old_prov = (HCRYPTPROV)ATOMIC_PTR_CAS(*((char *)&perm_prov), 0, (char *)prov);
+ 	if (LIKELY(!old_prov)) { /* no other threads acquired */
+ 	    if (prov != INVALID_HCRYPTPROV) {
  #undef RUBY_UNTYPED_DATA_WARNING
 -- 
 2.26.0.windows.1
