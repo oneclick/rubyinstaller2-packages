@@ -24,6 +24,7 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
         0002-Don-t-add-an-exe-file-manifest.patch
         0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch
         0009-Win32-Return-registry-strings-as-UTF-8.patch
+        0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
         ruby.ico
         rubyw.ico)
 
@@ -34,6 +35,7 @@ sha256sums=('e7f1653d653232ec433472489a91afbc7433c9f760cc822defe7437c9d95791b'
             'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
             '7bba11585dc597281e1c616f00a482016d57e5fb983f02fb05ed6260a9858ffd'
             'd221e357861ff3f46f29de978cc00a8f12ffdd865a5d8c1783f3e31e34675808'
+            '124f221ceb75d40e9f429603bf2383d8e60ad5fee9e2a9849e82bc9b89a41571'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
@@ -44,6 +46,7 @@ prepare() {
   patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
   patch -p1 -i ${srcdir}/0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch -l
   patch -p1 -i ${srcdir}/0009-Win32-Return-registry-strings-as-UTF-8.patch
+  patch -p1 -i ${srcdir}/0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
 }
 
 build() {
