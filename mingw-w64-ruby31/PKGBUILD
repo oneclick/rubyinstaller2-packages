@@ -25,6 +25,7 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
         0005-Windows-Prefer-USERPROFILE-over-HOMEPATH.patch
         0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch
         0008-The-AltGr-behaves-exactly-the-same-as-Ctrl-Alt.patch
+        0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
         ruby.ico
         rubyw.ico)
 
@@ -36,6 +37,7 @@ sha256sums=('597bd1849f252d8a6863cb5d38014ac54152b508c36dca156f6356a9e63c6102'
             '10cd0fd57774c347dbcd9b21709be76f6c47743076e2402b77039edef0ebb654'
             '7bba11585dc597281e1c616f00a482016d57e5fb983f02fb05ed6260a9858ffd'
             '1bc411c524ce724d444abb380dba612ba3b78cf7da5398d90b7cffc3fdaa07fe'
+            '124f221ceb75d40e9f429603bf2383d8e60ad5fee9e2a9849e82bc9b89a41571'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
@@ -47,6 +49,7 @@ prepare() {
   patch -p1 -i ${srcdir}/0005-Windows-Prefer-USERPROFILE-over-HOMEPATH.patch -l
   patch -p1 -i ${srcdir}/0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch -l
   patch -p1 -i ${srcdir}/0008-The-AltGr-behaves-exactly-the-same-as-Ctrl-Alt.patch
+  patch -p1 -i ${srcdir}/0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
 }
 
 build() {
