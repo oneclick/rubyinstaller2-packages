@@ -7,14 +7,17 @@
 # Configure
 cd "$(dirname "$0")"
 source 'ci-library.sh'
-deploy_enabled && mkdir artifacts
-git_config user.email 'ci@rubyinstaller.org'
-git_config user.name  'RubyInstaller2 Continuous Integration'
-git remote add upstream 'https://github.com/oneclick/rubyinstaller2-packages'
+# deploy_enabled && mkdir artifacts
+mkdir artifacts
+git_config user.email 'jayesh.s@iitgn.ac.in'
+git_config user.name  'Vishal1309'
+git remote add upstream 'https://github.com/Vishal1309/rubyinstaller2-packages'
 git fetch --quiet upstream
 
 # Decrypt and import private sigature key
-deploy_enabled && (gpg --batch --passphrase "${GPGPASSWD}" --decrypt appveyor-key.asc.asc | gpg --import)
+message 'pls help'
+# message "${GPGPASSWD}"
+# deploy_enabled && (gpg --batch --passphrase "${GPGPASSWD}" --decrypt appveyor-key.asc.asc | gpg --import)
 
 # Detect
 if [ -z "${APPVEYOR_SCHEDULED_BUILD}" ]
@@ -30,17 +33,18 @@ fi
 define_build_order || failure 'Could not determine build order'
 message 'Building packages' "${packages[@]}"
 
-execute 'Add [ci.ri2] respository to pacman.conf' add_ci_ri2_repo
+execute 'Add [test_tag] respository to pacman.conf' add_ci_ri2_repo
 
 # Build
 execute 'Approving recipe quality' check_recipe_quality
 for package in "${packages[@]}"; do
     arch_matches=$( sh -c "source ${package}/PKGBUILD && if [[ \" \${mingw_arch[@]} \" =~ \" ${MINGW_ARCH} \" ]]; then echo yes; fi " )
     if [[ ${arch_matches} == "yes" ]]; then
-        execute "Building binary for arch ${MINGW_ARCH}" makepkg-mingw --noconfirm --skippgpcheck --nocheck --syncdeps --rmdeps --cleanbuild --sign
+        execute "Building binary for arch ${MINGW_ARCH}" makepkg-mingw --noconfirm --skippgpcheck --nocheck --syncdeps --rmdeps --cleanbuild
     #     execute 'Installing' yes:pacman --upgrade *.pkg.tar.zst
     #     execute 'Uninstalling' yes:pacman --remove --recursive --cascade --noconfirm "${package/mingw-w64/mingw-w64-i686}" "${package/mingw-w64/mingw-w64-x86_64}" "${package/mingw-w64/mingw-w64-ucrt-x86_64}"
-        deploy_enabled && mv "${package}"/*.pkg.tar.zst "${package}"/*.pkg.tar.zst.sig artifacts
+        # deploy_enabled && mv "${package}"/*.pkg.tar.zst "${package}"/*.pkg.tar.zst.sig artifacts
+        mv "${package}"/*.pkg.tar.zst "${package}"/*.pkg.tar.zst.sig artifacts
     #     deploy_enabled && drop_old_bintray_versions "${package}"
     else
         execute "skip unsupported package arch ${MINGW_ARCH}"
