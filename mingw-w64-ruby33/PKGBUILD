@@ -24,6 +24,7 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
         0002-Don-t-add-an-exe-file-manifest.patch
         0009-Win32-Return-registry-strings-as-UTF-8.patch
         0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
+        0012-MINGW-Backport-wmain-patch-to-ruby-3.3.patch
         ruby.ico
         rubyw.ico)
 
@@ -34,6 +35,7 @@ sha256sums=('540975969d1af42190d26ff629bc93b1c3f4bffff4ab253e245e125085e66266'
             'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
             '5f84680f8cbce37b617f132e09009c111c78044d92378562456d8814db449346'
             '124f221ceb75d40e9f429603bf2383d8e60ad5fee9e2a9849e82bc9b89a41571'
+            '3b0f829b0de86ab41d0d2392995724818d7024d2b008c669df851217fa0e507d'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
@@ -44,6 +46,7 @@ prepare() {
   patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
   patch -p1 -i ${srcdir}/0009-Win32-Return-registry-strings-as-UTF-8.patch
   patch -p1 -i ${srcdir}/0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
+  patch -p1 -i ${srcdir}/0012-MINGW-Backport-wmain-patch-to-ruby-3.3.patch
 }
 
 build() {
