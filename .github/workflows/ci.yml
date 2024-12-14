@@ -14,6 +14,7 @@ jobs:
         - MINGW_ARCH: "mingw32"
         - MINGW_ARCH: "mingw64"
         - MINGW_ARCH: "ucrt64"
+        - MINGW_ARCH: "clangarm64"
 
     runs-on: windows-latest
     env:
