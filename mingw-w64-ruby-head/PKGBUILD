@@ -1,17 +1,19 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20240520
+pkgver=r20241214
 pkgver() {
   echo r`date +%Y%m%d`
 }
 pkgrel=1
 pkgdesc="An object-oriented language for quick and easy programming (mingw-w64)"
 arch=('any')
-mingw_arch=('mingw32' 'mingw64' 'ucrt64')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clangarm64')
 url="https://www.ruby-lang.org/en"
 license=("BSD, custom")
-makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-pkg-config" autoconf automake libtool)
+makedepends=("${MINGW_PACKAGE_PREFIX}-cc"
+             "${MINGW_PACKAGE_PREFIX}-pkgconf"
+             autoconf automake libtool patch make)
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-gmp"
          "${MINGW_PACKAGE_PREFIX}-libffi"
@@ -46,9 +48,13 @@ prepare() {
 
 build() {
 
-  CPPFLAGS+=" -DFD_SETSIZE=2048"
-  CFLAGS="-O3 -fno-fast-math -fstack-protector-strong"
+  CFLAGS="-O3 -fstack-protector-strong"
   LDFLAGS="-pipe -s -fstack-protector-strong"
+  if [[ ${MSYSTEM} == CLANG* ]]; then
+    CFLAGS+=" -Wno-dll-attribute-on-redeclaration"
+  else
+    CFLAGS+=" -Wno-incompatible-pointer-types"
+  fi
 
   [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
   mkdir -p "${srcdir}/build-${MINGW_CHOST}" && cd "${srcdir}/build-${MINGW_CHOST}"
