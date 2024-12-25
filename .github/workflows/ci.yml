@@ -14,7 +14,8 @@ jobs:
         - MINGW_ARCH: "mingw32"
         - MINGW_ARCH: "mingw64"
         - MINGW_ARCH: "ucrt64"
-        - MINGW_ARCH: "clangarm64"
+        # clangarm64 runs on native arm64 only, not on github CI:
+        # - MINGW_ARCH: "clangarm64"
 
     runs-on: windows-latest
     env:

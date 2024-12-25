@@ -47,7 +47,6 @@ prepare() {
 }
 
 build() {
-
   CFLAGS="-O3 -fstack-protector-strong"
   LDFLAGS="-pipe -s -fstack-protector-strong"
   if [[ ${MSYSTEM} == CLANG* ]]; then
