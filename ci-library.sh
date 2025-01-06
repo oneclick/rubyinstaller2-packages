@@ -229,10 +229,10 @@ add_ci_ri2_repo() {
     # install repman
     pacman --noconfirm --sync --needed pactoys
 
-    # Trust public signature key
+    # Trust public CI and ARM64 signature key
     pacman-key --init
-    gpg --export BE8BF1C5 | pacman-key --add -
-    pacman-key --lsign-key BE8BF1C5
+    gpg --export BE8BF1C5 AAE32BA7 | pacman-key --add -
+    pacman-key --lsign-key BE8BF1C5 AAE32BA7
 
     repman add ci.ri2 'https://github.com/oneclick/rubyinstaller2-packages/releases/download/ci.ri2'
 

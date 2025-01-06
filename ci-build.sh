@@ -15,6 +15,8 @@ git fetch --quiet upstream
 
 # Decrypt and import private sigature key
 deploy_enabled && (gpg --batch --passphrase "${GPGPASSWD}" --decrypt appveyor-key.asc.asc | gpg --import)
+# Add key used for ARM64 builds
+gpg --import lars@greiz-reinsdorf.de.key.asc
 
 # Detect
 if [ -z "${APPVEYOR_SCHEDULED_BUILD}" ]
