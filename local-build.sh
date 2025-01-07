@@ -10,7 +10,7 @@ rm -rf artifacts
 mkdir -p artifacts
 cd mingw-w64-ruby-head
 rm -f snapshot-master.tar.xz
-rm *.pkg.tar.zst *.pkg.tar.zst.sig
+rm -f *.pkg.tar.zst *.pkg.tar.zst.sig
 makepkg-mingw --noconfirm --nocheck --syncdeps --rmdeps --cleanbuild --sign -f
 cp *.pkg.tar.zst *.pkg.tar.zst.sig ../artifacts/
 cd ../artifacts/
