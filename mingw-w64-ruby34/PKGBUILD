@@ -23,30 +23,30 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
-        0002-Don-t-add-an-exe-file-manifest.patch
         ruby.ico
-        rubyw.ico)
+        rubyw.ico
+        placeholder.manifest.xml)
 
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
 sha256sums=('018d59ffb52be3c0a6d847e22d3fd7a2c52d0ddfee249d3517a0c8c6dbfa70af'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
-            'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
-            'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
+            'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a'
+            'c7a555d4826453efe7e33a2ebf78462b1fa665dffd7e4972143b48b1c9c71375')
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver2}
   rm -rf ext/win32/dll_directory
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
-  patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
 }
 
 build() {
   mkdir -p build-${MSYSTEM} && cd build-${MSYSTEM}
 
   CFLAGS="-O3 -fstack-protector-strong"
-  LDFLAGS="-pipe -s -fstack-protector-strong"
+  PLACEHOLDER_DLL_RES=`cygpath -m ${srcdir}/build-${MSYSTEM}/placeholder-manifest-dll.res`
+  LDFLAGS="-pipe -s -fstack-protector-strong ${PLACEHOLDER_DLL_RES}"
   if [[ ${MSYSTEM} == CLANG* ]]; then
     CFLAGS+=" -Wno-dll-attribute-on-redeclaration -Wno-shorten-64-to-32"
   else
@@ -54,6 +54,9 @@ build() {
   fi
 
   cp ${srcdir}/*.ico .
+  cp ${srcdir}/placeholder.manifest.xml .
+  echo "2 24 placeholder.manifest.xml" > placeholder-manifest-dll.rc
+  windres --input placeholder-manifest-dll.rc --output ${srcdir}/build-${MSYSTEM}/placeholder-manifest-dll.res --output-format=coff
 
   ../${_realname}-${pkgver2}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -62,7 +65,7 @@ build() {
     --target=${MINGW_CHOST} \
     --with-out-ext=readline,pty,syslog
 
-  make showflags main
+  make showflags main V=1
   echo "Generate RI and HTML documentation"
   # Make rdoc outputs so many lines -> print dots only
   make rdoc html 2>&1 | ./miniruby -ne "STDERR.print '.'"
@@ -83,4 +86,8 @@ package() {
     install ${srcdir}/ruby-${pkgver2}/bin/${script} \
       ${pkgdir}${MINGW_PREFIX}/bin/
   done
+
+  # Remove placeholder manifest from packaged rbconfig
+  # The flags are inherited from the ruby build but not inteded for builds on the target system
+  sed -i "s# ${PLACEHOLDER_DLL_RES}##g" ${pkgdir}/${MINGW_PREFIX}/lib/ruby/*/*/rbconfig.rb
 }
