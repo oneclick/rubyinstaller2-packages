@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20250109
+pkgver=r20250115
 pkgver() {
   echo r`date +%Y%m%d`
 }
@@ -50,11 +50,7 @@ build() {
   CFLAGS="-O3 -fstack-protector-strong"
   PLACEHOLDER_DLL_RES=`cygpath -m ${srcdir}/build-${MSYSTEM}/placeholder-manifest-dll.res`
   LDFLAGS="-pipe -s -fstack-protector-strong ${PLACEHOLDER_DLL_RES}"
-  if [[ ${MSYSTEM} == CLANG* ]]; then
-    CFLAGS+=" -Wno-dll-attribute-on-redeclaration -Wno-shorten-64-to-32"
-  else
-    CFLAGS+=" -Wno-incompatible-pointer-types"
-  fi
+  CXXFLAGS+=" -Wno-dll-attribute-on-redeclaration"
 
   cp ${srcdir}/*.ico .
   cp ${srcdir}/placeholder.manifest.xml .
@@ -66,7 +62,8 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --with-out-ext=readline,pty,syslog
+    --with-out-ext=readline,pty,syslog \
+    extra_warnflags="-Wno-shorten-64-to-32 -Wno-dll-attribute-on-redeclaration"
 
   make showflags main V=1
 
