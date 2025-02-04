@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20250115
+pkgver=r20250131
 pkgver() {
   echo r`date +%Y%m%d`
 }
