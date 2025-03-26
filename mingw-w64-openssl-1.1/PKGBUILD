@@ -25,7 +25,13 @@ source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz{,.asc}
         'openssl-1.1.1-mingw-arm.patch'
         'CVE-2023-5678.patch'
         'CVE-2024-0727.patch'
-        'openssl-1.1.1-pkcs1-implicit-rejection.patch')
+        'openssl-1.1.1-pkcs1-implicit-rejection.patch'
+        'CVE-2024-2511.patch'
+        'CVE-2024-4741.patch'
+        'CVE-2024-5535.patch'
+        'CVE-2024-9143.patch'
+        'CVE-2024-13176.patch'
+        )
 sha256sums=('SKIP'
             'SKIP'
             '703cd0cb74e714f9e66d26de11c109dd76fab07e723af8dde56a35ea65102e5f'
@@ -34,7 +40,12 @@ sha256sums=('SKIP'
             'd41fad88631e7b8d2a56662f2166ea97ecbc6369f2ad3eac415182bc9ac9f308'
             '2e98529ad940d1d5416b18c12e12cb80b787465e8cde685636bbebd066c6f6f8'
             'de6c97150e4e1fca99b10f35f39dc6e5c499b5db600b1010767cddda63d44c35'
-            'a840d0c2cb925d936e0db104ae57f24d4cc32c74c86404aa437cb7442649b35d')
+            'a840d0c2cb925d936e0db104ae57f24d4cc32c74c86404aa437cb7442649b35d'
+            '6c68fc3174d0cf05a7443f682995c38858625db119d83490e44f2cde44449827'
+            'd60b4a44dd2572a85ea8cb6de83a7069c9d87dc2473dbdff53549d4bdd84130b'
+            '4d5f434494402921463c85c72f49f436890ea358912173b2a99080d0eb8f6716'
+            'ae8c437ae75d1ca481c60fc3fa92a0cb3c68ec9a6d5e0109684541253ec107aa'
+            '2271072b4a40da5486f7b0331517a6cd3a2428991385cf802c8537f55e7a91b3')
 # https://www.openssl.org/community/otc.html
 validpgpkeys=(
   '8657ABB260F056B1E5190839D9C4D26D0E604491' # Matt Caswell <matt@openssl.org>
@@ -65,11 +76,16 @@ prepare() {
   cp -fHv "${srcdir}"/pathtools.h ./
 
   apply_patch_with_msg \
-     openssl-1.1.1-relocation.patch \
-     openssl-1.1.1-mingw-arm.patch \
-     CVE-2023-5678.patch \
-     CVE-2024-0727.patch \
-     openssl-1.1.1-pkcs1-implicit-rejection.patch
+    openssl-1.1.1-relocation.patch \
+    openssl-1.1.1-mingw-arm.patch \
+    CVE-2023-5678.patch \
+    CVE-2024-0727.patch \
+    openssl-1.1.1-pkcs1-implicit-rejection.patch \
+    CVE-2024-2511.patch \
+    CVE-2024-4741.patch \
+    CVE-2024-5535.patch \
+    CVE-2024-9143.patch \
+    CVE-2024-13176.patch
 }
 
 build() {
