@@ -19,7 +19,8 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libffi"
          "${MINGW_PACKAGE_PREFIX}-libyaml"
          "${MINGW_PACKAGE_PREFIX}-openssl>=3.0.0"
-         "${MINGW_PACKAGE_PREFIX}-zlib")
+         "${MINGW_PACKAGE_PREFIX}-zlib"
+         "${MINGW_PACKAGE_PREFIX}-libwinpthread-git")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
@@ -46,7 +47,7 @@ build() {
 
   CFLAGS="-O3 -fstack-protector-strong"
   PLACEHOLDER_DLL_RES=`cygpath -m ${srcdir}/build-${MSYSTEM}/placeholder-manifest-dll.res`
-  LDFLAGS="-pipe -s -fstack-protector-strong ${PLACEHOLDER_DLL_RES}"
+  LDFLAGS="-pipe -s -fstack-protector-strong ${PLACEHOLDER_DLL_RES} -lpthread"
   CXXFLAGS="-Wno-dll-attribute-on-redeclaration"
 
   cp ${srcdir}/*.ico .
