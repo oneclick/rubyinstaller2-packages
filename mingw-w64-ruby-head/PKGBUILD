@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20250408
+pkgver=r20250514
 pkgver() {
   echo r`date +%Y%m%d`
 }
@@ -49,7 +49,7 @@ build() {
   mkdir -p build-${MSYSTEM} && cd build-${MSYSTEM}
   CFLAGS="-O3 -fstack-protector-strong"
   PLACEHOLDER_DLL_RES=`cygpath -m ${srcdir}/build-${MSYSTEM}/placeholder-manifest-dll.res`
-  LDFLAGS="-pipe -s -fstack-protector-strong ${PLACEHOLDER_DLL_RES}"
+  LDFLAGS="-pipe -s -fstack-protector-strong ${PLACEHOLDER_DLL_RES} -lpthread"
   CXXFLAGS+=" -Wno-dll-attribute-on-redeclaration"
 
   cp ${srcdir}/*.ico .
