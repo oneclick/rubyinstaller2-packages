@@ -19,7 +19,8 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libffi"
          "${MINGW_PACKAGE_PREFIX}-libyaml"
          "${MINGW_PACKAGE_PREFIX}-openssl>=3.0.0"
-         "${MINGW_PACKAGE_PREFIX}-zlib")
+         "${MINGW_PACKAGE_PREFIX}-zlib"
+         "${MINGW_PACKAGE_PREFIX}-libwinpthread-git")
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-master.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
