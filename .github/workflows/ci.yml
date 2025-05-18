@@ -16,12 +16,15 @@ jobs:
       matrix:
         include:
         - MINGW_ARCH: "mingw32"
+          RUNON: windows-latest
         - MINGW_ARCH: "mingw64"
+          RUNON: windows-latest
         - MINGW_ARCH: "ucrt64"
-        # clangarm64 runs on native arm64 only, not on github CI:
-        # - MINGW_ARCH: "clangarm64"
+          RUNON: windows-latest
+        - MINGW_ARCH: "clangarm64"
+          RUNON: windows-11-arm
 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.RUNON }}
     env:
       MINGW_ARCH: ${{ matrix.MINGW_ARCH }}
       APPVEYOR_SCHEDULED_BUILD: ${{ github.event.schedule }}
@@ -49,10 +52,10 @@ jobs:
       shell: powershell
       # See https://github.com/msys2/MSYS2-packages/issues/258
       run: |
-        C:\msys64\usr\bin\rm -rf $env:MINGW_PREFIX/bin/libcrypto-3-x64.dll $env:MINGW_PREFIX/bin/libssl-3-x64.dll $env:MINGW_PREFIX/etc/ssl/openssl.cnf
-        C:\msys64\usr\bin\pacman --noconfirm --ask 20 --sync --refresh --refresh --sysupgrade --sysupgrade
-        Get-Process | Where-Object {$_.path -like 'C:\msys64*'} | Stop-Process
-        C:\msys64\usr\bin\pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
+        iex "${env:RI_DEVKIT}/usr/bin/rm -rf $env:MINGW_PREFIX/bin/libcrypto-3-x64.dll $env:MINGW_PREFIX/bin/libssl-3-x64.dll $env:MINGW_PREFIX/etc/ssl/openssl.cnf"
+        iex "${env:RI_DEVKIT}/usr/bin/pacman --noconfirm --ask 20 --sync --refresh --refresh --sysupgrade --sysupgrade"
+        Get-Process | Where-Object {$_.path -like ($env:RI_DEVKIT + '*')} | Stop-Process
+        iex "${env:RI_DEVKIT}/usr/bin/pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade"
 
     - name: Print version info
       shell: cmd
@@ -64,7 +67,7 @@ jobs:
       shell: cmd
       env:
         GPGPASSWD: ${{ secrets.GPGPASSWD }}
-      run: C:\msys64\usr\bin\bash --login -c "$(cygpath ${GITHUB_WORKSPACE})/ci-build.sh"
+      run: '%RI_DEVKIT%/usr/bin/bash --login -c "$(cygpath ${GITHUB_WORKSPACE})/ci-build.sh"'
 
     - name: Create lock ID
       shell: cmd
