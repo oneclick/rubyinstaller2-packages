@@ -2,7 +2,7 @@ _realname=ruby
 pkgbase=mingw-w64-ruby34
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby34"
 # version used by MRI
-pkgver2=3.4.4
+pkgver2=3.4.5
 # version used by pacman
 pkgver="${pkgver2/-/.}"
 pkgrel=2
@@ -31,7 +31,7 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
 
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
-sha256sums=('f76d63efe9499dedd8526b74365c0c811af00dc9feb0bed7f5356488476e28f4'
+sha256sums=('7b3a905b84b8777aa29f557bada695c3ce108390657e614d2cc9e2fb7e459536'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
             'f26122cca5e289801c0dde1f54643a960246a69691c6c8b9bccb27e536344f69'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
