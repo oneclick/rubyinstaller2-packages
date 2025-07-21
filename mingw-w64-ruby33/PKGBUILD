@@ -22,8 +22,12 @@ options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
         0002-Don-t-add-an-exe-file-manifest.patch
+        0003-Use-autoconf-2.72.patch
+        0004-Fix-C23-GCC-15-WIN32-compatibility-for-rb_define_-fu.patch
+        0007-Fix-redefinition-of-clock_gettime-and-clock_getres.patch
         0009-Win32-Return-registry-strings-as-UTF-8.patch
         0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
+        0011-ruby-io-console-Use-gperf-3.1-to-generate-ANSI-C-cod.patch
         ruby.ico
         rubyw.ico)
 
@@ -32,8 +36,12 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
 sha256sums=('44ae70fee043da3ce48289b7a52618ebe32dc083253993d486211c7e445c8642'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
             'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
+            'f26122cca5e289801c0dde1f54643a960246a69691c6c8b9bccb27e536344f69'
+            'b1b509871ec2aef0fffcf50e5150382d5115a69ea59fac4a061643401689c88d'
+            '972fd8114d2617cf1c0c3d7dae75d856bf5fa757daa9d0ebbdd17d21ddbb96e8'
             '5f84680f8cbce37b617f132e09009c111c78044d92378562456d8814db449346'
             '124f221ceb75d40e9f429603bf2383d8e60ad5fee9e2a9849e82bc9b89a41571'
+            '6a4cc40328887f9ee20e4fb1b052c44d2c86e892b1f64a097d8763c2bd5cda25'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
@@ -42,8 +50,13 @@ prepare() {
   rm -rf ext/win32/dll_directory
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
   patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
+  patch -p1 -i ${srcdir}/0003-Use-autoconf-2.72.patch
+  patch -p1 -i ${srcdir}/0004-Fix-C23-GCC-15-WIN32-compatibility-for-rb_define_-fu.patch
+  patch -p1 -i ${srcdir}/0007-Fix-redefinition-of-clock_gettime-and-clock_getres.patch
   patch -p1 -i ${srcdir}/0009-Win32-Return-registry-strings-as-UTF-8.patch
   patch -p1 -i ${srcdir}/0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
+  patch -p1 -i ${srcdir}/0011-ruby-io-console-Use-gperf-3.1-to-generate-ANSI-C-cod.patch
+  autoreconf -fi
 }
 
 build() {
