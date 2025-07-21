@@ -1,0 +1,36 @@
+From 0cd86ffb2e4b270084510a0ed056329ddc949e5d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E5=8D=9C=E9=83=A8=E6=98=8C=E5=B9=B3?=
+ <shyouhei@ruby-lang.org>
+Date: Wed, 14 Sep 2022 11:32:24 +0900
+Subject: [PATCH] avoid ANYARGS
+
+Use macro instead of a static functon.  This isn't very amusing but
+doing this wihtout a macro (is possibe but) seems just too much.
+---
+ file.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/file.c b/file.c
+index de7ed5e33b..862f9630df 100644
+--- a/file.c
++++ b/file.c
+@@ -6504,12 +6504,10 @@ rb_find_file(VALUE path)
+     return copy_path_class(tmp, path);
+ }
+ 
+-static void
+-define_filetest_function(const char *name, VALUE (*func)(ANYARGS), int argc)
+-{
+-    rb_define_module_function(rb_mFileTest, name, func, argc);
+-    rb_define_singleton_method(rb_cFile, name, func, argc);
+-}
++#define define_filetest_function(name, func, argc) do {        \
++    rb_define_module_function(rb_mFileTest, name, func, argc); \
++    rb_define_singleton_method(rb_cFile, name, func, argc);    \
++} while(false)
+ 
+ const char ruby_null_device[] =
+ #if defined DOSISH
+-- 
+2.47.1.windows.1
+

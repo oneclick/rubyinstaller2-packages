@@ -26,8 +26,11 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
         0004-Fix-C23-GCC-15-WIN32-compatibility-for-rb_define_-fu.patch
         0005-Windows-Prefer-USERPROFILE-over-HOMEPATH.patch
         0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch
+        0007-Fix-redefinition-of-clock_gettime-and-clock_getres.patch
         0008-The-AltGr-behaves-exactly-the-same-as-Ctrl-Alt.patch
         0010-Mingw32-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
+        0011-ruby-io-console-Use-gperf-3.1-to-generate-ANSI-C-cod.patch
+        0013-avoid-ANYARGS.patch
         ruby.ico
         rubyw.ico)
 
@@ -40,8 +43,11 @@ sha256sums=('658acc455b6bda87ac6cc1380e86552b9c1af87055e7a127589c5bf7ed80b035'
             'b1b509871ec2aef0fffcf50e5150382d5115a69ea59fac4a061643401689c88d'
             '10cd0fd57774c347dbcd9b21709be76f6c47743076e2402b77039edef0ebb654'
             '7bba11585dc597281e1c616f00a482016d57e5fb983f02fb05ed6260a9858ffd'
+            '972fd8114d2617cf1c0c3d7dae75d856bf5fa757daa9d0ebbdd17d21ddbb96e8'
             '1bc411c524ce724d444abb380dba612ba3b78cf7da5398d90b7cffc3fdaa07fe'
             '98346821d026870f13c5f9fa2a8fef70e257f6812447a134d0b71b07b7b8f8e6'
+            '6a4cc40328887f9ee20e4fb1b052c44d2c86e892b1f64a097d8763c2bd5cda25'
+            '18e3a4b2525cb6899d92d36d816230f88a2073af704de09ce68b7fc398d8719b'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
@@ -54,8 +60,12 @@ prepare() {
   patch -p1 -i ${srcdir}/0004-Fix-C23-GCC-15-WIN32-compatibility-for-rb_define_-fu.patch
   patch -p1 -i ${srcdir}/0005-Windows-Prefer-USERPROFILE-over-HOMEPATH.patch -l
   patch -p1 -i ${srcdir}/0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch -l
+  patch -p1 -i ${srcdir}/0007-Fix-redefinition-of-clock_gettime-and-clock_getres.patch
   patch -p1 -i ${srcdir}/0008-The-AltGr-behaves-exactly-the-same-as-Ctrl-Alt.patch
   patch -p1 -i ${srcdir}/0010-Mingw32-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
+  patch -p1 -i ${srcdir}/0011-ruby-io-console-Use-gperf-3.1-to-generate-ANSI-C-cod.patch
+  patch -p1 -i ${srcdir}/0013-avoid-ANYARGS.patch
+  autoreconf -fi
 }
 
 build() {
