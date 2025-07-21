@@ -22,6 +22,8 @@ options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
         0002-Don-t-add-an-exe-file-manifest.patch
+        0003-Use-autoconf-2.72.patch
+        0004-Fix-C23-GCC-15-WIN32-compatibility-for-rb_define_-fu.patch
         0005-Windows-Prefer-USERPROFILE-over-HOMEPATH.patch
         0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch
         0008-The-AltGr-behaves-exactly-the-same-as-Ctrl-Alt.patch
@@ -34,6 +36,8 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
 sha256sums=('658acc455b6bda87ac6cc1380e86552b9c1af87055e7a127589c5bf7ed80b035'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
             'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
+            'f26122cca5e289801c0dde1f54643a960246a69691c6c8b9bccb27e536344f69'
+            'b1b509871ec2aef0fffcf50e5150382d5115a69ea59fac4a061643401689c88d'
             '10cd0fd57774c347dbcd9b21709be76f6c47743076e2402b77039edef0ebb654'
             '7bba11585dc597281e1c616f00a482016d57e5fb983f02fb05ed6260a9858ffd'
             '1bc411c524ce724d444abb380dba612ba3b78cf7da5398d90b7cffc3fdaa07fe'
@@ -46,6 +50,8 @@ prepare() {
   rm -rf ext/win32/dll_directory
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
   patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
+  patch -p1 -i ${srcdir}/0003-Use-autoconf-2.72.patch
+  patch -p1 -i ${srcdir}/0004-Fix-C23-GCC-15-WIN32-compatibility-for-rb_define_-fu.patch
   patch -p1 -i ${srcdir}/0005-Windows-Prefer-USERPROFILE-over-HOMEPATH.patch -l
   patch -p1 -i ${srcdir}/0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch -l
   patch -p1 -i ${srcdir}/0008-The-AltGr-behaves-exactly-the-same-as-Ctrl-Alt.patch
