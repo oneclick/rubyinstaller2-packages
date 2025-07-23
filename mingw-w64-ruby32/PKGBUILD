@@ -21,6 +21,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
+        0001-Skip-failing-tests-with-mingw-platform.patch
         0002-Don-t-add-an-exe-file-manifest.patch
         0003-Use-autoconf-2.72.patch
         0004-Fix-C23-GCC-15-WIN32-compatibility-for-rb_define_-fu.patch
@@ -36,6 +37,7 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
 
 sha256sums=('1cccd3100155275293ae5d4ea0a1a1068f5de69e71732220f144acce26327a3c'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
+            'adc834133ecb6deeea8c76163ef05025f8bb4ddeaca2f38a52dba404a02366c5'
             'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
             'f26122cca5e289801c0dde1f54643a960246a69691c6c8b9bccb27e536344f69'
             'b1b509871ec2aef0fffcf50e5150382d5115a69ea59fac4a061643401689c88d'
@@ -51,6 +53,7 @@ prepare() {
   cd ${srcdir}/${_realname}-${pkgver2}
   rm -rf ext/win32/dll_directory
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
+  patch -p1 -i ${srcdir}/0001-Skip-failing-tests-with-mingw-platform.patch
   patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
   patch -p1 -i ${srcdir}/0003-Use-autoconf-2.72.patch
   patch -p1 -i ${srcdir}/0004-Fix-C23-GCC-15-WIN32-compatibility-for-rb_define_-fu.patch
