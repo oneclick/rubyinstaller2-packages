@@ -26,6 +26,7 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
         0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch
         0009-Win32-Return-registry-strings-as-UTF-8.patch
         0010-Mingw32-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
+        0014-ssl-remove-OpenSSL-X509-V_FLAG_CRL_CHECK_ALL-from-th.patch
         ruby.ico
         rubyw.ico)
 
@@ -38,6 +39,7 @@ sha256sums=('cf6699d0084c588e7944d92e1a8edda28b1cc3ee471a1f0aebb4b3d32c9753b2'
             '7bba11585dc597281e1c616f00a482016d57e5fb983f02fb05ed6260a9858ffd'
             '5f84680f8cbce37b617f132e09009c111c78044d92378562456d8814db449346'
             '5947650b4c503cbc9fc176479b70e18e6d8ca2b21ddcf3763ee97972140420f7'
+            '2e761b66d4ffc89e3bd3bf92ae2b102a8634ae47871b81f4c9e8103af62f8d00'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
@@ -50,6 +52,7 @@ prepare() {
   patch -p1 -i ${srcdir}/0006-Windows-Prefer-USERPROFILE-over-HOMEPATH-on-startup-.patch -l
   patch -p1 -i ${srcdir}/0009-Win32-Return-registry-strings-as-UTF-8.patch
   patch -p1 -i ${srcdir}/0010-Mingw32-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
+  patch -p1 -i ${srcdir}/0014-ssl-remove-OpenSSL-X509-V_FLAG_CRL_CHECK_ALL-from-th.patch
   autoreconf -fi
 }
 
