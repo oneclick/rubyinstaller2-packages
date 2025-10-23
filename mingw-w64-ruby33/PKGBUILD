@@ -2,7 +2,7 @@ _realname=ruby
 pkgbase=mingw-w64-ruby33
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby33"
 # version used by MRI
-pkgver2=3.3.9
+pkgver2=3.3.10
 # version used by pacman
 pkgver="${pkgver2/-/.}"
 pkgrel=1
@@ -26,20 +26,18 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
         0009-Win32-Return-registry-strings-as-UTF-8.patch
         0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
         0011-ruby-io-console-Use-gperf-3.1-to-generate-ANSI-C-cod.patch
-        0014-ssl-remove-OpenSSL-X509-V_FLAG_CRL_CHECK_ALL-from-th.patch
         ruby.ico
         rubyw.ico)
 
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
-sha256sums=('2b24a2180a2f7f63c099851a1d01e6928cf56d515d136a91bd2075423a7a76bb'
+sha256sums=('3a06c3a709672a4ddae4e511d7e82f74799b8b3f550c8cf2d6f32089003cb84c'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
             'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
             'f26122cca5e289801c0dde1f54643a960246a69691c6c8b9bccb27e536344f69'
             '5f84680f8cbce37b617f132e09009c111c78044d92378562456d8814db449346'
             '124f221ceb75d40e9f429603bf2383d8e60ad5fee9e2a9849e82bc9b89a41571'
             '6a4cc40328887f9ee20e4fb1b052c44d2c86e892b1f64a097d8763c2bd5cda25'
-            '2e761b66d4ffc89e3bd3bf92ae2b102a8634ae47871b81f4c9e8103af62f8d00'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
 
@@ -52,7 +50,6 @@ prepare() {
   patch -p1 -i ${srcdir}/0009-Win32-Return-registry-strings-as-UTF-8.patch
   patch -p1 -i ${srcdir}/0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
   patch -p1 -i ${srcdir}/0011-ruby-io-console-Use-gperf-3.1-to-generate-ANSI-C-cod.patch
-  patch -p1 -i ${srcdir}/0014-ssl-remove-OpenSSL-X509-V_FLAG_CRL_CHECK_ALL-from-th.patch
   autoreconf -fi
 }
 
