@@ -86,7 +86,7 @@ check() {
 
 package() {
   cd build-${MSYSTEM}
-  make -f GNUmakefile DESTDIR="${pkgdir}" install
+  make -f GNUmakefile DESTDIR="${pkgdir}${MINGW_PREFIX}" install
   for script in gem; do
     install ${srcdir}/snapshot-master/bin/${script} \
       ${pkgdir}${MINGW_PREFIX}/bin/
