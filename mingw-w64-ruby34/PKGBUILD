@@ -2,7 +2,7 @@ _realname=ruby
 pkgbase=mingw-w64-ruby34
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby34"
 # version used by MRI
-pkgver2=3.4.7
+pkgver2=3.4.8
 # version used by pacman
 pkgver="${pkgver2/-/.}"
 pkgrel=1
@@ -25,17 +25,15 @@ options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
         0002-Use-autoconf-2.72.patch
-        0014-ssl-remove-OpenSSL-X509-V_FLAG_CRL_CHECK_ALL-from-th.patch
         ruby.ico
         rubyw.ico
         placeholder.manifest.xml)
 
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
-sha256sums=('db425a86f6e07546957578f4946cc700a91e7fd51115a86c56e096f30e0530c7'
+sha256sums=('53a8ec71111449cbbd42224d8d27c493fa6ded228636731051c48604d4255d68'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
             'f26122cca5e289801c0dde1f54643a960246a69691c6c8b9bccb27e536344f69'
-            '2e761b66d4ffc89e3bd3bf92ae2b102a8634ae47871b81f4c9e8103af62f8d00'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a'
             'c7a555d4826453efe7e33a2ebf78462b1fa665dffd7e4972143b48b1c9c71375')
@@ -45,7 +43,6 @@ prepare() {
   rm -rf ext/win32/dll_directory
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
   patch -p1 -i ${srcdir}/0002-Use-autoconf-2.72.patch
-  patch -p1 -i ${srcdir}/0014-ssl-remove-OpenSSL-X509-V_FLAG_CRL_CHECK_ALL-from-th.patch
   autoreconf -fi
 }
 
