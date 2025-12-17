@@ -93,3 +93,4 @@ package() {
   # The flags are inherited from the ruby build but not inteded for builds on the target system
   sed -i "s# ${PLACEHOLDER_DLL_RES}##g" ${pkgdir}/${MINGW_PREFIX}/lib/ruby/*/*/rbconfig.rb
 }
+
