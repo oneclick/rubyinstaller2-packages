@@ -1,0 +1,108 @@
+From fc347d3c3571264b7e35ebcac36762c084b01825 Mon Sep 17 00:00:00 2001
+From: Lars Kanis <lars@greiz-reinsdorf.de>
+Date: Wed, 2 Oct 2024 22:44:21 +0200
+Subject: [PATCH] Windows: Change command line interface to UTF-8
+
+- script name
+- include paths
+- script input from stdin
+---
+ ruby.c                        | 25 ++++---------------------
+ test/ruby/test_rubyoptions.rb | 14 +++-----------
+ 2 files changed, 7 insertions(+), 32 deletions(-)
+
+diff --git a/ruby.c b/ruby.c
+index 61de5cdcbe..e79d4b69da 100644
+--- a/ruby.c
++++ b/ruby.c
+@@ -2168,7 +2168,7 @@ prism_script(ruby_cmdline_options_t *opt, pm_parse_result_t *result)
+     const bool read_stdin = (strcmp(opt->script, "-") == 0);
+ 
+     if (read_stdin) {
+-        pm_options_encoding_set(options, rb_enc_name(rb_locale_encoding()));
++        pm_options_encoding_set(options, rb_enc_name(IF_UTF8_PATH(rb_utf8_encoding(), rb_locale_encoding())));
+     }
+     if (opt->src.enc.name != 0) {
+         pm_options_encoding_set(options, StringValueCStr(opt->src.enc.name));
+@@ -2443,14 +2443,8 @@ process_options(int argc, char **argv, ruby_cmdline_options_t *opt)
+ #endif
+     }
+     rb_enc_associate(opt->script_name, IF_UTF8_PATH(uenc, lenc));
+-#if UTF8_PATH
+-    if (uenc != lenc) {
+-        opt->script_name = str_conv_enc(opt->script_name, uenc, lenc);
+-        opt->script = RSTRING_PTR(opt->script_name);
+-    }
+-#endif
+     rb_obj_freeze(opt->script_name);
+-    if (IF_UTF8_PATH(uenc != lenc, 1)) {
++    {
+         long i;
+         VALUE load_path = vm->load_path;
+         const ID id_initial_load_path_mark = INITIAL_LOAD_PATH_MARK;
+@@ -2460,13 +2454,7 @@ process_options(int argc, char **argv, ruby_cmdline_options_t *opt)
+         for (i = 0; i < RARRAY_LEN(load_path); ++i) {
+             VALUE path = RARRAY_AREF(load_path, i);
+             int mark = rb_attr_get(path, id_initial_load_path_mark) == path;
+-#if UTF8_PATH
+-            VALUE newpath = rb_str_conv_enc(path, uenc, lenc);
+-            if (newpath == path) continue;
+-            path = newpath;
+-#else
+-            if (!(path = copy_str(path, lenc, !mark))) continue;
+-#endif
++            if (!(path = copy_str(path, IF_UTF8_PATH(uenc, lenc), !mark))) continue;
+             if (mark) rb_ivar_set(path, id_initial_load_path_mark, path);
+             if (!modifiable) {
+                 rb_ary_modify(load_path);
+@@ -2594,11 +2582,6 @@ process_options(int argc, char **argv, ruby_cmdline_options_t *opt)
+         VALUE path = Qnil;
+         if (!opt->e_script && strcmp(opt->script, "-")) {
+             path = rb_realpath_internal(Qnil, opt->script_name, 1);
+-#if UTF8_PATH
+-            if (uenc != lenc) {
+-                path = str_conv_enc(path, uenc, lenc);
+-            }
+-#endif
+             if (!ENCODING_GET(path)) { /* ASCII-8BIT */
+                 rb_enc_copy(path, opt->script_name);
+             }
+@@ -2760,7 +2743,7 @@ load_file_internal(VALUE argp_v)
+         enc = rb_enc_from_index(opt->src.enc.index);
+     }
+     else if (f == rb_stdin) {
+-        enc = rb_locale_encoding();
++        enc = IF_UTF8_PATH(rb_utf8_encoding(), rb_locale_encoding());
+     }
+     else {
+         enc = rb_utf8_encoding();
+diff --git a/test/ruby/test_rubyoptions.rb b/test/ruby/test_rubyoptions.rb
+index ac4b5870eb..fac0901fdf 100644
+--- a/test/ruby/test_rubyoptions.rb
++++ b/test/ruby/test_rubyoptions.rb
+@@ -1082,19 +1082,11 @@ def test_command_line_glob_nonascii
+ 
+     def test_command_line_progname_nonascii
+       bug10555 = '[ruby-dev:48752] [Bug #10555]'
+-      name = expected = nil
+-      unless (0x80..0x10000).any? {|c|
+-               name = c.chr(Encoding::UTF_8)
+-               expected = name.encode("locale") rescue nil
+-             }
+-        omit "can't make locale name"
+-      end
+-      name << ".rb"
+-      expected << ".rb"
++      name = "\u{20ac}.rb"
+       with_tmpchdir do |dir|
+         open(name, "w") {|f| f.puts "puts File.basename($0)"}
+-        assert_in_out_err([name], "", [expected], [],
+-                          bug10555, encoding: "locale")
++        assert_in_out_err([name], "", [name], [],
++                          bug10555, encoding: "utf-8")
+       end
+     end
+ 
+-- 
+2.47.1.windows.1
+
