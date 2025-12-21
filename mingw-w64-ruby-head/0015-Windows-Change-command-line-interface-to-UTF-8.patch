@@ -1,4 +1,4 @@
-From fc347d3c3571264b7e35ebcac36762c084b01825 Mon Sep 17 00:00:00 2001
+From ab0eda3a4172a6def66559b680f46262fc702262 Mon Sep 17 00:00:00 2001
 From: Lars Kanis <lars@greiz-reinsdorf.de>
 Date: Wed, 2 Oct 2024 22:44:21 +0200
 Subject: [PATCH] Windows: Change command line interface to UTF-8
@@ -7,9 +7,10 @@ Subject: [PATCH] Windows: Change command line interface to UTF-8
 - include paths
 - script input from stdin
 ---
- ruby.c                        | 25 ++++---------------------
- test/ruby/test_rubyoptions.rb | 14 +++-----------
- 2 files changed, 7 insertions(+), 32 deletions(-)
+ ruby.c                                   | 25 ++++--------------------
+ spec/ruby/language/magic_comment_spec.rb |  8 +++++++-
+ test/ruby/test_rubyoptions.rb            | 14 +++----------
+ 3 files changed, 14 insertions(+), 33 deletions(-)
 
 diff --git a/ruby.c b/ruby.c
 index 61de5cdcbe..e79d4b69da 100644
@@ -76,6 +77,25 @@ index 61de5cdcbe..e79d4b69da 100644
      }
      else {
          enc = rb_utf8_encoding();
+diff --git a/spec/ruby/language/magic_comment_spec.rb b/spec/ruby/language/magic_comment_spec.rb
+index f2bf3a08e5..98f424c3d0 100644
+--- a/spec/ruby/language/magic_comment_spec.rb
++++ b/spec/ruby/language/magic_comment_spec.rb
+@@ -3,7 +3,13 @@
+ # See core/kernel/eval_spec.rb for more magic comments specs for eval()
+ describe :magic_comments, shared: true do
+   before :each do
+-    @default = @method == :locale ? Encoding.find('locale') : Encoding::UTF_8
++    @default = if @method == :locale &&
++        ( platform_is_not(:windows) || ruby_version_is(""..."3.4") )
++    then
++      Encoding.find('locale')
++    else
++      Encoding::UTF_8
++    end
+   end
+ 
+   it "are optional" do
 diff --git a/test/ruby/test_rubyoptions.rb b/test/ruby/test_rubyoptions.rb
 index ac4b5870eb..fac0901fdf 100644
 --- a/test/ruby/test_rubyoptions.rb
@@ -104,5 +124,5 @@ index ac4b5870eb..fac0901fdf 100644
      end
  
 -- 
-2.47.1.windows.1
+2.49.0
 
