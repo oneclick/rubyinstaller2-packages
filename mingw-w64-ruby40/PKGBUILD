@@ -14,8 +14,7 @@ license=("BSD, custom")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cc"
              "${MINGW_PACKAGE_PREFIX}-pkgconf"
              autoconf automake libtool patch make)
-depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
-         "${MINGW_PACKAGE_PREFIX}-gmp"
+depends=("${MINGW_PACKAGE_PREFIX}-gmp"
          "${MINGW_PACKAGE_PREFIX}-libffi"
          "${MINGW_PACKAGE_PREFIX}-libyaml"
          "${MINGW_PACKAGE_PREFIX}-openssl>=3.0.0"
