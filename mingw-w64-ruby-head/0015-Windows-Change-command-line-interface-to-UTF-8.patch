@@ -87,7 +87,7 @@ index f2bf3a08e5..98f424c3d0 100644
    before :each do
 -    @default = @method == :locale ? Encoding.find('locale') : Encoding::UTF_8
 +    @default = if @method == :locale &&
-+        ( platform_is_not(:windows) || ruby_version_is(""..."3.4") )
++        ( platform_is_not(:windows) || ruby_version_is(""..."4.0") )
 +    then
 +      Encoding.find('locale')
 +    else

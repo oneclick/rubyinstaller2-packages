@@ -25,6 +25,7 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
         0002-Use-autoconf-2.72.patch
         0015-Windows-Change-command-line-interface-to-UTF-8.patch
+        0016-Windows-Change-command-line-interface-to-UTF-8-specs.patch
         ruby.ico
         rubyw.ico
         placeholder.manifest.xml)
@@ -34,7 +35,8 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
 sha256sums=('a72bacee9de07283ebc19baa4ac243b193129f21aa4e168c7186fb1fe7d07fe1'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
             'f26122cca5e289801c0dde1f54643a960246a69691c6c8b9bccb27e536344f69'
-            '576c6dca87493d5543ce1da790aa50c9a4e86aca9ecdec34077e8e3d4b90648f'
+            'ba88fdfb5e643dfc12ca18af10e8cb19cdef420b1a887cdb5b7b5635ab33d7e1'
+            'df87d0a6711911e6bb6376046a8c724953e1cc20b9919f0ea58fdd709b016d21'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a'
             'c7a555d4826453efe7e33a2ebf78462b1fa665dffd7e4972143b48b1c9c71375')
@@ -45,6 +47,7 @@ prepare() {
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
   patch -p1 -i ${srcdir}/0002-Use-autoconf-2.72.patch
   patch -p1 -i ${srcdir}/0015-Windows-Change-command-line-interface-to-UTF-8.patch
+  patch -p1 -i ${srcdir}/0016-Windows-Change-command-line-interface-to-UTF-8-specs.patch
   autoreconf -fi
 }
 
