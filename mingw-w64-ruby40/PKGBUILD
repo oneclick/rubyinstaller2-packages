@@ -5,7 +5,7 @@ pkgname="${MINGW_PACKAGE_PREFIX}-ruby40"
 pkgver2=4.0.1
 # version used by pacman
 pkgver="${pkgver2/-/.}"
-pkgrel=1
+pkgrel=2
 pkgdesc="An object-oriented language for quick and easy programming (mingw-w64)"
 arch=('any')
 mingw_arch=('ucrt64' 'clangarm64')
