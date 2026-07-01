@@ -16,15 +16,6 @@ diff --git a/ruby.c b/ruby.c
 index 61de5cdcbe..e79d4b69da 100644
 --- a/ruby.c
 +++ b/ruby.c
-@@ -2168,7 +2168,7 @@ prism_script(ruby_cmdline_options_t *opt, pm_parse_result_t *result)
-     const bool read_stdin = (strcmp(opt->script, "-") == 0);
- 
-     if (read_stdin) {
--        pm_options_encoding_set(options, rb_enc_name(rb_locale_encoding()));
-+        pm_options_encoding_set(options, rb_enc_name(IF_UTF8_PATH(rb_utf8_encoding(), rb_locale_encoding())));
-     }
-     if (opt->src.enc.name != 0) {
-         pm_options_encoding_set(options, StringValueCStr(opt->src.enc.name));
 @@ -2443,14 +2443,8 @@ process_options(int argc, char **argv, ruby_cmdline_options_t *opt)
  #endif
      }
@@ -68,15 +59,6 @@ index 61de5cdcbe..e79d4b69da 100644
              if (!ENCODING_GET(path)) { /* ASCII-8BIT */
                  rb_enc_copy(path, opt->script_name);
              }
-@@ -2760,7 +2743,7 @@ load_file_internal(VALUE argp_v)
-         enc = rb_enc_from_index(opt->src.enc.index);
-     }
-     else if (f == rb_stdin) {
--        enc = rb_locale_encoding();
-+        enc = IF_UTF8_PATH(rb_utf8_encoding(), rb_locale_encoding());
-     }
-     else {
-         enc = rb_utf8_encoding();
 diff --git a/spec/ruby/language/magic_comment_spec.rb b/spec/ruby/language/magic_comment_spec.rb
 index f2bf3a08e5..98f424c3d0 100644
 --- a/spec/ruby/language/magic_comment_spec.rb
