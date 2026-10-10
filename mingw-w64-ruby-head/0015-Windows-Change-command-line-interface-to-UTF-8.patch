@@ -29,7 +29,7 @@ index 61de5cdcbe..e79d4b69da 100644
      rb_obj_freeze(opt->script_name);
 -    if (IF_UTF8_PATH(uenc != lenc, 1)) {
 +    {
-         long i;
+         rb_len_t i;
          VALUE load_path = vm->load_path;
          const ID id_initial_load_path_mark = INITIAL_LOAD_PATH_MARK;
 @@ -2460,13 +2454,7 @@ process_options(int argc, char **argv, ruby_cmdline_options_t *opt)
