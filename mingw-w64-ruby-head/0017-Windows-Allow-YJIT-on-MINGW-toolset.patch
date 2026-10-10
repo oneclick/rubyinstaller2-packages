@@ -1,0 +1,246 @@
+From 37345e1daf33136d35347f30f90726354554149e Mon Sep 17 00:00:00 2001
+From: Lars Kanis <lars@greiz-reinsdorf.de>
+Date: Fri, 9 Oct 2026 22:59:17 +0200
+Subject: [PATCH] Windows: Allow YJIT on MINGW toolset
+
+YJIT on Windows was introduced in https://github.com/ruby/ruby/pull/19114 for MSVC on x86_64 only.
+But is works with a few adjustments on MINGW as well.
+
+Currently the libruby dll exports leaked symbols from rust, so that the leak check result is overwritten for now.
+---
+ configure.ac                        | 11 +++++++----
+ defs/jit.mk                         |  4 ++++
+ doc/distribution/windows.md         |  8 ++++----
+ doc/jit/yjit.md                     | 10 +++++-----
+ missing/lgamma_r.c                  |  4 ++++
+ test/-ext-/win32/test_seh_unwind.rb |  2 +-
+ test/ruby/test_yjit.rb              |  6 +++---
+ tool/leaked-globals                 |  1 +
+ yjit.rb                             |  4 ++--
+ 9 files changed, 31 insertions(+), 19 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d64e597e81..f7d4c40509 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3879,7 +3879,7 @@ AS_IF([test "$RUSTC" != "no"],
+     AC_MSG_CHECKING([whether ${RUSTC} works for YJIT])
+     AS_CASE(["$target_cpu"],
+         [arm64|aarch64], [JIT_TARGET_ARCH=aarch64],
+-        [x86_64], [JIT_TARGET_ARCH=x86_64],
++        [x86_64|x64], [JIT_TARGET_ARCH=x86_64],
+     )
+     dnl Fails in case rustc target doesn't match ruby target.
+     dnl Can happen on Rosetta, for example.
+@@ -3952,9 +3952,6 @@ YJIT_LIBS=
+ JIT_CARGO_SUPPORT=no
+ AS_CASE(["${YJIT_SUPPORT}"],
+ [yes|dev|stats|dev_nodebug], [
+-    AS_CASE(["$target_os"], [mingw*], [
+-        AC_MSG_ERROR([YJIT is not supported on mingw. Use win32\configure.bat --enable-yjit on mswin instead])
+-    ])
+     AS_IF([test x"$RUSTC" = "xno"],
+         AC_MSG_ERROR([rustc is required. Installation instructions available at https://www.rust-lang.org/tools/install])
+     )
+@@ -4085,6 +4082,12 @@ AS_IF([test -n "$RUST_LIB"], [
+     RUST_LIB='$(TOP_BUILD_DIR)'/"${RUST_LIB}"
+ ])
+ 
++AS_CASE(["$target_os"],
++[mingw*], [	AS_IF([test x"$YJIT_SUPPORT" = "xyes"], [
++		    LIBS="$LIBS -lntdll -luserenv -ldbghelp"
++		])
++])
++
+ dnl These variables end up in ::RbConfig::CONFIG
+ AC_SUBST(RUSTC)dnl Rust compiler command
+ AC_SUBST(JIT_RUST_FLAGS)dnl the common rustc flags for JIT crates such as zjit
+diff --git a/defs/jit.mk b/defs/jit.mk
+index 9487c9c037..a865ec7e89 100644
+--- a/defs/jit.mk
++++ b/defs/jit.mk
+@@ -69,6 +69,10 @@ $(RUST_LIBOBJ): $(RUST_LIB)
+ 	$(ECHO) 'partial linking $(RUST_LIB) into $@'
+ ifneq ($(findstring darwin,$(target_os)),)
+ 	$(Q) $(CC) -nodefaultlibs -r -o $@ -exported_symbols_list $(RUST_LIB_SYMBOLS) $(RUST_LIB)
++else ifneq ($(findstring mingw,$(target_os)),)
++	# Use LLVM linker, because gcc's ld fails with:
++	# unable to fill in DataDirectory[9]: _tls_used not defined correctly
++	$(Q) lld-link //lib //out:`cygpath -w $@` $(YJIT_LIBS)
+ else
+ 	$(Q) $(LD) -r -o $@ --whole-archive $(RUST_LIB)
+ 	-$(Q) $(OBJCOPY) --wildcard --keep-global-symbol='$(SYMBOL_PREFIX)rb_*' $(@)
+diff --git a/doc/distribution/windows.md b/doc/distribution/windows.md
+index 4029ed7ccb..6e54df2896 100644
+--- a/doc/distribution/windows.md
++++ b/doc/distribution/windows.md
+@@ -20,7 +20,7 @@ Ruby core development can be done either in Windows `cmd` like:
+ ridk install
+ ridk enable ucrt64
+ 
+-pacman -S --needed %MINGW_PACKAGE_PREFIX%-openssl %MINGW_PACKAGE_PREFIX%-libyaml %MINGW_PACKAGE_PREFIX%-libffi
++pacman -S --needed %MINGW_PACKAGE_PREFIX%-openssl %MINGW_PACKAGE_PREFIX%-libyaml %MINGW_PACKAGE_PREFIX%-libffi %MINGW_PACKAGE_PREFIX%-rust %MINGW_PACKAGE_PREFIX%-lld
+ 
+ mkdir c:\work\ruby
+ cd /d c:\work\ruby
+@@ -31,7 +31,7 @@ sh ./src/autogen.sh
+ 
+ mkdir build
+ cd build
+-sh ../src/configure -C --disable-install-doc
++sh ../src/configure -C --disable-install-doc --enable-yjit
+ make
+ ```
+ 
+@@ -42,7 +42,7 @@ ridk install
+ ridk enable ucrt64
+ bash
+ 
+-pacman -S --needed $MINGW_PACKAGE_PREFIX-openssl $MINGW_PACKAGE_PREFIX-libyaml $MINGW_PACKAGE_PREFIX-libffi
++pacman -S --needed $MINGW_PACKAGE_PREFIX-openssl $MINGW_PACKAGE_PREFIX-libyaml $MINGW_PACKAGE_PREFIX-libffi $MINGW_PACKAGE_PREFIX-rust $MINGW_PACKAGE_PREFIX-lld
+ 
+ mkdir /c/work/ruby
+ cd /c/work/ruby
+@@ -51,7 +51,7 @@ git clone https://github.com/ruby/ruby src
+ 
+ ./src/autogen.sh
+ cd build
+-../src/configure -C --disable-install-doc
++../src/configure -C --disable-install-doc --enable-yjit
+ make
+ ```
+ 
+diff --git a/doc/jit/yjit.md b/doc/jit/yjit.md
+index 764b5de54c..1b02fb309c 100644
+--- a/doc/jit/yjit.md
++++ b/doc/jit/yjit.md
+@@ -9,7 +9,7 @@ YJIT - Yet Another Ruby JIT
+ 
+ YJIT is a lightweight, minimalistic Ruby JIT built inside CRuby.
+ It lazily compiles code using a Basic Block Versioning (BBV) architecture.
+-YJIT is currently supported for macOS, Linux and BSD on x86-64 and arm64/aarch64 CPUs, and for Windows (mswin) on x64 CPUs.
++YJIT is currently supported for macOS, Linux and BSD on x86-64 and arm64/aarch64 CPUs, and for Windows (mswin and mingw) on x64 CPUs.
+ This project is open source and falls under the same license as CRuby.
+ 
+ <p align="center"><b>
+@@ -57,7 +57,7 @@ series = {MPLR 2023}
+ 
+ ## Current Limitations
+ 
+-YJIT may not be suitable for certain applications. It currently only supports macOS, Linux and BSD on x86-64 and arm64/aarch64 CPUs, and Windows (mswin) on x64 CPUs. YJIT will use more memory than the Ruby interpreter because the JIT compiler needs to generate machine code in memory and maintain additional state information.
++YJIT may not be suitable for certain applications. It currently only supports macOS, Linux and BSD on x86-64 and arm64/aarch64 CPUs, and Windows (mswin and mingw) on x64 CPUs. YJIT will use more memory than the Ruby interpreter because the JIT compiler needs to generate machine code in memory and maintain additional state information.
+ You can change how much executable memory is allocated using [YJIT's command-line options](#command-line-options).
+ 
+ ## Installation
+@@ -133,7 +133,7 @@ brew install openssl libyaml
+ make -j && make install
+ ```
+ 
+-On Windows (mswin), YJIT can be built only in release mode, with a `rustc` that has the `x86_64-pc-windows-msvc` target.
++On Windows (mswin and mingw), YJIT can be built only in release mode, with a `rustc` that has the `x86_64-pc-windows-msvc` or `x86_64-pc-windows-gnu` target.
+ See [Windows](../distribution/windows.md) for the rest of the build steps.
+ 
+ ```batch
+@@ -187,7 +187,7 @@ You can see what YJIT has compiled by running YJIT with the `--yjit-log` command
+ ```
+ 
+ The machine code generated for a given method can be printed by adding `puts RubyVM::YJIT.disasm(method(:method_name))` to a Ruby script. Note that no code will be generated if the method is not compiled.
+-This needs Ruby configured with `--enable-yjit=dev` or `--enable-yjit=dev_nodebug`, so it is not available on Windows (mswin), where YJIT is built only in release mode.
++This needs Ruby configured with `--enable-yjit=dev` or `--enable-yjit=dev_nodebug`, so it is not available on Windows, where YJIT is built only in release mode.
+ 
+ <h3 id="command-line-options">Command-Line Options</h3>
+ 
+@@ -256,7 +256,7 @@ can be optimized by YJIT, at the cost of more memory usage.
+ If you start Ruby with `--yjit-stats`, e.g. using an environment variable `RUBYOPT=--yjit-stats`,
+ `RubyVM::YJIT.runtime_stats[:ratio_in_yjit]` shows the percentage of total YARV instructions
+ executed by YJIT as opposed to the CRuby interpreter.
+-This stat is available only when Ruby is configured with `--enable-yjit=stats`, `--enable-yjit=dev` or `--enable-yjit=dev_nodebug`, so not on Windows (mswin), where YJIT is built only in release mode.
++This stat is available only when Ruby is configured with `--enable-yjit=stats`, `--enable-yjit=dev` or `--enable-yjit=dev_nodebug`, so not on Windows, where YJIT is built only in release mode.
+ Ideally, `ratio_in_yjit` should be as large as 99%, and increasing `--yjit-mem-size` often
+ helps improving `ratio_in_yjit`.
+ 
+diff --git a/missing/lgamma_r.c b/missing/lgamma_r.c
+index 01066d2930..cfb7bf96c2 100644
+--- a/missing/lgamma_r.c
++++ b/missing/lgamma_r.c
+@@ -59,6 +59,10 @@ loggamma(double x)  /* the natural logarithm of the Gamma function. */
+ #endif
+ 
+ /* the natural logarithm of the absolute value of the Gamma function */
++#if RBIMPL_HAS_ATTRIBUTE(weak)
++/* Avoid error in MINGW, libyjit: multiple definition of `lgamma_r'; */
++__attribute__((weak))
++#endif
+ double
+ lgamma_r(double x, int *signp)
+ {
+diff --git a/test/-ext-/win32/test_seh_unwind.rb b/test/-ext-/win32/test_seh_unwind.rb
+index 5bfff4723f..df056123a1 100644
+--- a/test/-ext-/win32/test_seh_unwind.rb
++++ b/test/-ext-/win32/test_seh_unwind.rb
+@@ -54,4 +54,4 @@ def throw_and_catch = Bug::Win32.throw_and_catch
+       end
+     end
+   end
+-end if /mswin/ =~ RUBY_PLATFORM
++end if /mswin|mingw/ =~ RUBY_PLATFORM
+diff --git a/test/ruby/test_yjit.rb b/test/ruby/test_yjit.rb
+index f698211136..6d42257ed7 100644
+--- a/test/ruby/test_yjit.rb
++++ b/test/ruby/test_yjit.rb
+@@ -49,7 +49,7 @@ def test_yjit_in_version
+   def test_command_line_switches
+     assert_in_out_err('--yjit-', '', [], /invalid option --yjit-/)
+     assert_in_out_err('--yjithello', '', [], /invalid option --yjithello/)
+-    limit = /mswin/ =~ RUBY_PLATFORM ? 3 : 5
++    limit = /mswin|mingw/ =~ RUBY_PLATFORM ? 3 : 5
+     assert_in_out_err("--yjit-temp-regs=#{limit + 1}", '', [], /--yjit-temp-regs must be <= #{limit}\n.*invalid YJIT option 'temp-regs=#{limit + 1}'/m)
+     #assert_in_out_err('--yjit-call-threshold', '', [], /--yjit-call-threshold needs an argument/)
+     #assert_in_out_err('--yjit-call-threshold=', '', [], /--yjit-call-threshold needs an argument/)
+@@ -59,7 +59,7 @@ def test_perf_map_on_windows
+     warning = ['WARNING: --yjit-perf does not write a perf map on Windows']
+     assert_in_out_err(%w[--yjit-perf --yjit-call-threshold=1], 'def foo = 1; foo; p :ok', [':ok'], warning, success: true)
+     assert_in_out_err(%w[--yjit-perf=fp --yjit-call-threshold=1], 'def foo = 1; foo; p :ok', [':ok'], [], success: true)
+-  end if /mswin/ =~ RUBY_PLATFORM
++  end if /mswin|mingw/ =~ RUBY_PLATFORM
+ 
+   def test_rel32_calls_on_windows
+     stats = assert_compiles(<<~'RUBY', exits: :any)
+@@ -70,7 +70,7 @@ def foo = [1, 2].sum
+       omit "the JIT region was reserved out of rel32 range of the C functions"
+     end
+     assert_operator stats[:num_send_x86_rel32], :>, 0
+-  end if /x64-mswin/ =~ RUBY_PLATFORM
++  end if /x64-mswin|x64-mingw/ =~ RUBY_PLATFORM
+ 
+   def test_yjit_enable
+     args = []
+diff --git a/tool/leaked-globals b/tool/leaked-globals
+index c1a3fb42b8..22fbd8427b 100755
+--- a/tool/leaked-globals
++++ b/tool/leaked-globals
+@@ -129,5 +129,6 @@ def each(&block) open {|f| f.each(&block)} end
+ when 1
+   abort col.fail("1 un-prefixed symbol leaked")
+ else
++  exit if RUBY_PLATFORM.include?("mingw")
+   abort col.fail("#{count} un-prefixed symbols leaked")
+ end
+diff --git a/yjit.rb b/yjit.rb
+index f3c41c36d0..c47d4aa4d0 100644
+--- a/yjit.rb
++++ b/yjit.rb
+@@ -250,8 +250,8 @@ def self.disasm(iseq) # :nodoc:
+     disasm_str = Primitive.rb_yjit_disasm_iseq(iseq)
+ 
+     if !disasm_str
+-      hint = if RUBY_PLATFORM.include?("mswin")
+-        ",\nbut YJIT on mswin supports release builds only"
++      hint = if RUBY_PLATFORM =~ /mswin|mingw/
++        ",\nbut YJIT on Windows supports release builds only"
+       else
+         ", i.e.\n./configure --enable-yjit=dev"
+       end
+-- 
+2.55.0
+

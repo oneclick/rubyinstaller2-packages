@@ -13,6 +13,8 @@ url="https://www.ruby-lang.org/en"
 license=("BSD, custom")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cc"
              "${MINGW_PACKAGE_PREFIX}-pkgconf"
+             "${MINGW_PACKAGE_PREFIX}-rust"
+             "${MINGW_PACKAGE_PREFIX}-lld"
              autoconf automake libtool patch make)
 depends=("${MINGW_PACKAGE_PREFIX}-gmp"
          "${MINGW_PACKAGE_PREFIX}-libffi"
@@ -25,6 +27,7 @@ source=("https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-master.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
         0002-Use-autoconf-2.72.patch
         0015-Windows-Change-command-line-interface-to-UTF-8.patch
+        0017-Windows-Allow-YJIT-on-MINGW-toolset.patch
         ruby.ico
         rubyw.ico
         placeholder.manifest.xml)
@@ -37,6 +40,7 @@ sha256sums=('SKIP'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
             'f26122cca5e289801c0dde1f54643a960246a69691c6c8b9bccb27e536344f69'
             'b9a9c54ea7892b1134180159f95b8e07795056a67d010e161da496e31d827c1e'
+            '86ff9cf84ce15f4b71d60bbb704a491c00c241c0ee3de2e83df94e9c7f6c85f0'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
             'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a'
             'c7a555d4826453efe7e33a2ebf78462b1fa665dffd7e4972143b48b1c9c71375')
@@ -48,6 +52,7 @@ prepare() {
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
   patch -p1 -i ${srcdir}/0002-Use-autoconf-2.72.patch
   patch -p1 -i ${srcdir}/0015-Windows-Change-command-line-interface-to-UTF-8.patch
+  patch -p1 -i ${srcdir}/0017-Windows-Allow-YJIT-on-MINGW-toolset.patch
   autoreconf -fi
 }
 
@@ -69,6 +74,7 @@ build() {
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
     --with-out-ext=readline,pty,syslog \
+    --enable-yjit \
     extra_warnflags="-Wno-shorten-64-to-32 -Wno-dll-attribute-on-redeclaration"
 
   make showflags main V=1
