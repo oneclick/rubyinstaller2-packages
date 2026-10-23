@@ -21,29 +21,28 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
-        0002-Don-t-add-an-exe-file-manifest.patch
         0003-Use-autoconf-2.72.patch
         0009-Win32-Return-registry-strings-as-UTF-8.patch
         0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
         ruby.ico
-        rubyw.ico)
+        rubyw.ico
+        placeholder.manifest.xml)
 
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
 sha256sums=('6bd764359992373a96556b45fb7dfe6b6170da34a0a2fd0b7e1be7932fea982b'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
-            'da079dbfdc3d4e1b976ed15d58244ed6e0df201ec829bead578fb4a7177b9cab'
             'f26122cca5e289801c0dde1f54643a960246a69691c6c8b9bccb27e536344f69'
             '5f84680f8cbce37b617f132e09009c111c78044d92378562456d8814db449346'
             '124f221ceb75d40e9f429603bf2383d8e60ad5fee9e2a9849e82bc9b89a41571'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
-            'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a')
+            'c30fb04ac0e88ba634daaa811a81ea5a75027646617b895acd14df9518a4a55a'
+            'c7a555d4826453efe7e33a2ebf78462b1fa665dffd7e4972143b48b1c9c71375')
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver2}
   rm -rf ext/win32/dll_directory
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
-  patch -p1 -i ${srcdir}/0002-Don-t-add-an-exe-file-manifest.patch
   patch -p1 -i ${srcdir}/0003-Use-autoconf-2.72.patch
   patch -p1 -i ${srcdir}/0009-Win32-Return-registry-strings-as-UTF-8.patch
   patch -p1 -i ${srcdir}/0010-Windows-Use-ATOMIC_PTR-functions-to-avoid-compiler-w.patch
@@ -51,15 +50,19 @@ prepare() {
 }
 
 build() {
+  mkdir -p build-${MSYSTEM} && cd build-${MSYSTEM}
 
   CPPFLAGS+=" -DFD_SETSIZE=2048"
   CFLAGS="-O3 -fno-fast-math -fstack-protector-strong"
-  LDFLAGS="-pipe -s -fstack-protector-strong"
+  PLACEHOLDER_DLL_RES=`cygpath -m ${srcdir}/build-${MSYSTEM}/placeholder-manifest-dll.res`
+  LDFLAGS="-pipe -s -fstack-protector-strong ${PLACEHOLDER_DLL_RES}"
 
   [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
-  mkdir -p "${srcdir}/build-${MINGW_CHOST}" && cd "${srcdir}/build-${MINGW_CHOST}"
 
   cp ${srcdir}/*.ico .
+  cp ${srcdir}/placeholder.manifest.xml .
+  echo "2 24 placeholder.manifest.xml" > placeholder-manifest-dll.rc
+  windres --input placeholder-manifest-dll.rc --output ${srcdir}/build-${MSYSTEM}/placeholder-manifest-dll.res --output-format=coff
 
   ../${_realname}-${pkgver2}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -75,7 +78,7 @@ build() {
 }
 
 check() {
-  cd "${srcdir}/build-${MINGW_CHOST}"
+  cd build-${MSYSTEM}
   echo $PATH
   make -l "TESTOPTS=-q" btest test-basic
   # TODO: Full tests fail currently
@@ -83,10 +86,14 @@ check() {
 }
 
 package() {
-  cd "${srcdir}/build-${MINGW_CHOST}"
+  cd build-${MSYSTEM}
   make -f GNUMakefile DESTDIR="${pkgdir}" install
   for script in gem; do
     install ${srcdir}/ruby-${pkgver2}/bin/${script} \
       ${pkgdir}${MINGW_PREFIX}/bin/
   done
+
+  # Remove placeholder manifest from packaged rbconfig
+  # The flags are inherited from the ruby build but not inteded for builds on the target system
+  sed -i "s# ${PLACEHOLDER_DLL_RES}##g" ${pkgdir}/${MINGW_PREFIX}/lib/ruby/*/*/rbconfig.rb
 }
