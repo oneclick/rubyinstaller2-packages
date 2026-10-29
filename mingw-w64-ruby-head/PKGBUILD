@@ -57,6 +57,7 @@ build() {
   PLACEHOLDER_DLL_RES=`cygpath -m ${srcdir}/build-${MSYSTEM}/placeholder-manifest-dll.res`
   LDFLAGS="-pipe -s -fstack-protector-strong ${PLACEHOLDER_DLL_RES} -lpthread"
   CXXFLAGS+=" -Wno-dll-attribute-on-redeclaration"
+  CPPFLAGS+=" -DSIZEOF_RB_LEN_T=8"
 
   cp ${srcdir}/*.ico .
   cp ${srcdir}/placeholder.manifest.xml .
@@ -69,7 +70,7 @@ build() {
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
     --with-out-ext=readline,pty,syslog \
-    extra_warnflags="-Wno-shorten-64-to-32 -Wno-dll-attribute-on-redeclaration"
+    extra_warnflags="-Wno-dll-attribute-on-redeclaration"
 
   make showflags main V=1
 
