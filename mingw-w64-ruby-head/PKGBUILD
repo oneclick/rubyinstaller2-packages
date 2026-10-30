@@ -59,6 +59,11 @@ build() {
   CXXFLAGS+=" -Wno-dll-attribute-on-redeclaration"
   CPPFLAGS+=" -DSIZEOF_RB_LEN_T=8"
 
+  # Only clang has a specific option to warn about rb_len_t => long conversion
+  if [[ "${MSYSTEM}" =~ ^CLANG ]]; then
+    CFLAGS+=" -Wshorten-64-to-32"
+  fi
+
   cp ${srcdir}/*.ico .
   cp ${srcdir}/placeholder.manifest.xml .
   echo "2 24 placeholder.manifest.xml" > placeholder-manifest-dll.rc
