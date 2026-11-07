@@ -103,4 +103,6 @@ package() {
   # Remove placeholder manifest from packaged rbconfig
   # The flags are inherited from the ruby build but not inteded for builds on the target system
   sed -i "s# ${PLACEHOLDER_DLL_RES}##g" ${pkgdir}/${MINGW_PREFIX}/lib/ruby/*/*/rbconfig.rb
+  # Ruby adds -Wno-shorten-64-to-32 on MINGW, but extensions should warn instead
+  sed -i "s# -Wno-shorten-64-to-32##g" ${pkgdir}/${MINGW_PREFIX}/lib/ruby/*/*/rbconfig.rb
 }
