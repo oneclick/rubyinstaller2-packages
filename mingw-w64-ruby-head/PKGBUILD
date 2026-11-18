@@ -1,7 +1,7 @@
 _realname=ruby
 pkgbase=mingw-w64-ruby-head
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby-head"
-pkgver=r20261010
+pkgver=r20261118
 pkgver() {
   echo r`date +%Y%m%d`
 }
@@ -25,7 +25,6 @@ depends=("${MINGW_PACKAGE_PREFIX}-gmp"
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-master.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
-        0002-Use-autoconf-2.72.patch
         0015-Windows-Change-command-line-interface-to-UTF-8.patch
         0017-Windows-Allow-YJIT-on-MINGW-toolset.patch
         ruby.ico
@@ -38,7 +37,6 @@ noextract=("snapshot-master.tar.xz")
 
 sha256sums=('SKIP'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
-            'f26122cca5e289801c0dde1f54643a960246a69691c6c8b9bccb27e536344f69'
             'b9a9c54ea7892b1134180159f95b8e07795056a67d010e161da496e31d827c1e'
             '73f39d96a0d1258367890c0f9d50a99d5d10b2d35d30ea408285811271e7422e'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
@@ -50,7 +48,6 @@ prepare() {
   cd ${srcdir}/snapshot-master
   rm -rf ext/win32/dll_directory
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
-  patch -p1 -i ${srcdir}/0002-Use-autoconf-2.72.patch
   patch -p1 -i ${srcdir}/0015-Windows-Change-command-line-interface-to-UTF-8.patch
   patch -p1 -i ${srcdir}/0017-Windows-Allow-YJIT-on-MINGW-toolset.patch
   autoreconf -fi
