@@ -2,7 +2,7 @@ _realname=ruby
 pkgbase=mingw-w64-ruby40
 pkgname="${MINGW_PACKAGE_PREFIX}-ruby40"
 # version used by MRI
-pkgver2=4.0.9
+pkgver2=4.0.10
 # version used by pacman
 pkgver="${pkgver2/-/.}"
 pkgrel=1
@@ -23,7 +23,6 @@ depends=("${MINGW_PACKAGE_PREFIX}-gmp"
 options=('staticlibs' 'strip')
 source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgver2}.tar.xz"
         0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
-        0002-Use-autoconf-2.72.patch
         0015-Windows-Change-command-line-interface-to-UTF-8.patch
         0016-Windows-Change-command-line-interface-to-UTF-8-specs.patch
         ruby.ico
@@ -32,9 +31,8 @@ source=("https://cache.ruby-lang.org/pub/ruby/${pkgver2%.*}/${_realname}-${pkgve
 
 # To update SHA256 hashs run: ridk exec sh -c "updpkgsums PKGBUILD"
 
-sha256sums=('a8057adb39f51ad6dc3106237504c93dd792bb515837b4fe7817ae21ed7e51f4'
+sha256sums=('1537f7a6003c436546ecab6b48b6e7725a9af2328f45a8af7f42f41c5df90ab8'
             'a50c81ab8c178689485257f8eaa70bd8184b878a798780084668f838912e2832'
-            'f26122cca5e289801c0dde1f54643a960246a69691c6c8b9bccb27e536344f69'
             'ba88fdfb5e643dfc12ca18af10e8cb19cdef420b1a887cdb5b7b5635ab33d7e1'
             'df87d0a6711911e6bb6376046a8c724953e1cc20b9919f0ea58fdd709b016d21'
             '6c80ba2ca49840e387a08b7fedc6e7acd298ac2ec853155209efb2af20397b22'
@@ -45,7 +43,6 @@ prepare() {
   cd ${srcdir}/${_realname}-${pkgver2}
   rm -rf ext/win32/dll_directory
   patch -p1 -i ${srcdir}/0001-Add-C-ext-win32-dll_directory-as-an-alternative-to-f.patch
-  patch -p1 -i ${srcdir}/0002-Use-autoconf-2.72.patch
   patch -p1 -i ${srcdir}/0015-Windows-Change-command-line-interface-to-UTF-8.patch
   patch -p1 -i ${srcdir}/0016-Windows-Change-command-line-interface-to-UTF-8-specs.patch
   autoreconf -fi
